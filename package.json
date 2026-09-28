@@ -1,0 +1,17 @@
+{
+  "name": "tiktok-auction-overlay",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "tiktok-live-connector": "^2.5.0"
+  }
+}
