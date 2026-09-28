@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auction Overlay</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="overlay-body">
+<div class="overlay-root" id="overlayRoot">
+  <div class="overlay-title"><span class="title-star">★</span><span id="overlayTitle">AUCTION</span><span class="title-dot"></span></div>
+  <div class="ov-chip" id="minimumChip">MINIMUM: 0 🪙</div>
+  <div class="ov-chip pink" id="snipeChip">SNIPE TIME 10S</div>
+  <div class="ov-timer-card"><div id="phaseLabel">WAITING</div><strong id="timer">00:00</strong></div>
+  <div id="rows" class="ov-rows"></div>
+  <div id="winnerPanel" class="winner-panel hidden">
+    <div class="winner-kicker">🏆 WINNER</div>
+    <strong id="winnerName">—</strong>
+    <div class="winner-chat-label">Winner Chat</div>
+    <div class="winner-chat-row">
+      <div id="winnerChat" class="winner-chat">
+        <img id="winnerChatAvatar" class="winner-chat-avatar" src="" alt="">
+        <div class="winner-chat-content"><span id="winnerChatUser" class="winner-chat-user">Winner</span><span class="winner-chat-colon">:</span><span id="winnerChatText" class="winner-chat-text">Waiting for winner chat…</span></div>
+      </div>
+      <button id="winnerChatCopy" class="winner-chat-copy" type="button" aria-label="Copy winner chat">Copy</button>
+    </div>
+    <div class="winner-coins" id="winnerCoins">0 🪙</div>
+  </div>
+  <div id="prizeBar" class="prize-bar">PRIZE: Prize #1</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/overlay.js"></script>
+</body>
+</html>
