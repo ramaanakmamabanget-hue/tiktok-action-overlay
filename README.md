@@ -1,4 +1,4 @@
-# TikTok Auction Overlay — Railway Multi-User v3.0
+# TikTok Auction Overlay — Railway Multi-User v3.2
 
 Versi ini mempertahankan tampilan dashboard dan overlay yang sudah ada, tetapi server sekarang dibuat **multi-user / multi-session**.
 
@@ -132,3 +132,36 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
 - Anti duplicate gift handling.
 - Snipe / Draw phase.
 - Reconnect setelah Connect pernah dipicu.
+
+## v3.1 — Overlay baru (neon dark)
+
+- Frame hitam pekat (`#000`) dengan border neon + efek shiny (sheen sweep) di semua frame.
+- Frame Snipe Delay dihapus; diganti frame **Prize** dengan teks rainbow gradient yang bergerak halus.
+- Background halaman biru tua `#001a66` untuk chroma key. Bisa diganti lewat URL:
+  `/overlay/<token>?bg=black`, `?bg=transparent`, atau `?bg=hex` (contoh `?bg=00ff00`).
+- Ada penghitung **Total participants**.
+- Railway: `railway.json` (healthcheck `/api/health`) dan `Procfile` sudah disertakan.
+
+## v3.2 — Efek tambahan
+
+- **OVERTAKEN!** saat top 1 diambil orang lain; baris bertukar posisi dengan animasi geser.
+- **Selisih ke #1:** tampil di kanan baris top 2 dan 3 sebagai `-29` + koin merah.
+- **5 detik terakhir** (snipe/draw): tick tiap detik; **3-2-1** besar; saat snipe frame merah berdenyut dan timer membesar.
+- **Winner:** flash emas + confetti + suara fanfare.
+- **Suara** (dibuat langsung oleh browser, tanpa file): coin saat ada bid, tick, overtaken, winner.
+  - Toggle **Sound** di control panel (Setup).
+  - Matikan per-URL dengan `?mute=1`. Preview di dashboard selalu senyap.
+  - Di OBS Browser Source suara langsung jalan. Di browser biasa, klik halaman sekali dulu (aturan autoplay browser).
+- **Tema warna** lewat URL: `?theme=blue` (default), `gold`, `pink`, `green`.
+  Contoh: `https://DOMAIN/overlay/<token>?theme=gold&bg=black`
+- **Winner panel** dihias: sunburst emas berputar, mahkota, avatar dengan ring rainbow, sparkle berkedip, badge koin dan prize.
+- **Efek gift / coin bertambah** (skala 4 tingkat: <50, 50-199, 200-999, 1000+):
+  baris berkedip + bergetar, angka koin menghitung naik dengan pop, koin & bintang berhamburan, ripple, `+N` membesar,
+  banner gift (avatar, nama, jumlah, combo xN) muncul untuk SEMUA gifter termasuk yang di luar top 3,
+  gift besar membuat frame berkedip emas, gift 1000+ ditambah confetti dan suara berbeda.
+- **Gift >= 20 koin:** koin berpencar dari banner gift lalu terbang satu per satu masuk ke baris top; angka naik tiap koin tiba (500 koin ~1,6 dtk), ikon koin berdenyut tiap kedatangan.
+- **Efek gift bertingkat** (canvas, file `public/fx.js`):
+  - 20-99 koin: koin terbang satu per satu ke baris.
+  - **100+ BURST:** koin meledak ke segala arah lalu tersedot masuk ke baris, angka naik tiap koin tiba.
+  - **500+ GALAXY:** nebula ungu-pink-biru, bintang, galaksi spiral yang berputar lalu runtuh masuk ke baris.
+  - **1000+ NUKE:** alarm merah, rudal jatuh menghantam baris, flash putih, shockwave, bola api, awan jamur, koin berhamburan, layar bergetar; angka koin menjadi **rainbow** saat naik.

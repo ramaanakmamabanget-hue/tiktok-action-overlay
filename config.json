@@ -1,0 +1,11 @@
+{
+  "tiktokUsername": "",
+  "regularSeconds": 30,
+  "snipeSeconds": 10,
+  "drawSeconds": 30,
+  "minimumCoins": 0,
+  "drawMarginCoins": 0,
+  "prize": "Prize #1",
+  "autoSave": false,
+  "eulerApiKey": ""
+}

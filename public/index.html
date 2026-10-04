@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auction — TikTok LIVE Control</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="dashboard">
+<div class="shell">
+  <header class="topbar">
+    <div>
+      <div class="brand"><span class="brand-star">★</span> AUCTION</div>
+      <div class="muted">TikTok LIVE overlay control</div>
+    </div>
+    <div class="top-actions">
+      <a class="ghost" id="openOverlay" href="/overlay" target="_blank">Open Overlay</a>
+      <span id="connBadge" class="status-badge">DISCONNECTED</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel config-panel">
+      <div class="panel-head"><div><h2>Setup</h2><p>Connect your LIVE account and configure the round.</p></div></div>
+      <form id="settingsForm" class="form-grid">
+        <label>TikTok username<input id="tiktokUsername" placeholder="yourusername" autocomplete="off"><small class="field-help">Masukkan username LIVE, tanpa link. Akun harus sedang LIVE saat koneksi dilakukan.</small></label>
+        <label>Euler Stream API key (FREE)<input id="eulerApiKey" type="password" placeholder="Paste your free key here" autocomplete="off"><small class="field-help">Free key membuat koneksi tidak memakai anonymous sign limit. <a href="https://www.eulerstream.com/register" target="_blank" rel="noreferrer">Create free key</a>.</small></label>
+        <label>Regular time (sec)<input id="regularSeconds" type="number" min="1"></label>
+        <label>Snipe time (sec)<input id="snipeSeconds" type="number" min="1"></label>
+        <label>Draw time (sec)<input id="drawSeconds" type="number" min="1"></label>
+        <label>Minimum coins<input id="minimumCoins" type="number" min="0"></label>
+        <label>Draw margin (coins)<input id="drawMarginCoins" type="number" min="0"></label>
+        <label class="full">Prize<input id="prize" placeholder="e.g. 500 Robux"></label>
+        <label class="autosave-toggle"><input id="soundEnabled" type="checkbox" checked><span>Sound</span><small>Overlay sound effects (coin, tick, winner)</small></label>
+        <label class="autosave-toggle"><input id="autoSave" type="checkbox"><span>Auto Save</span><small>Automatically save setup changes</small></label>
+        <div class="full actions-row"><button class="primary" id="saveBtn" type="submit">Save</button><button class="secondary" id="connectBtn" type="button">Connect</button><button class="danger" id="resetBtn" type="button">Reset Round</button><button class="secondary" id="reloadSnipeBtn" type="button">RELOAD SNIPE</button></div>
+      </form>
+    </section>
+
+    <section class="panel live-panel">
+      <div class="panel-head"><div><h2>Live Auction</h2><p id="phaseText">Idle</p></div><button id="startBtn" class="primary big">Start Auction</button></div>
+      <div class="live-grid">
+        <div class="metric"><span>Phase</span><strong id="phaseValue">IDLE</strong></div>
+        <div class="metric"><span>Countdown</span><strong id="countdown">00:00</strong></div>
+        <div class="metric"><span>Auction</span><strong id="auctionId">#0</strong></div>
+      </div>
+      <div class="preview-wrap"><div class="preview-title">Overlay preview</div><iframe id="overlayFrame" src="/overlay" title="Auction overlay preview"></iframe></div>
+    </section>
+
+    <section class="panel leaderboard-panel">
+      <div class="panel-head"><div><h2>Top 3</h2><p>Qualifying by coin total.</p></div></div>
+      <div id="leaderboard" class="dash-list"></div>
+      <div id="winnerBox" class="winner-box hidden"></div>
+    </section>
+
+    <section class="panel demo-panel">
+      <div class="panel-head"><div><h2>Demo tools</h2><p>Test the overlay without TikTok LIVE.</p></div></div>
+      <div class="demo-form"><input id="demoName" placeholder="Viewer name" value="Viewer"></input><input id="demoCoins" type="number" min="1" value="100"></input><button id="demoGift" class="primary">Send demo gift</button></div>
+      <div class="demo-presets"><button data-coins="25">+25</button><button data-coins="100">+100</button><button data-coins="500">+500</button><button data-coins="1000">+1K</button></div>
+    </section>
+
+    <section class="panel activity-panel">
+      <div class="panel-head"><div><h2>Activity</h2><p id="connectionText">Waiting for connection…</p></div></div>
+      <div class="activity-columns"><div><h3>Gifts</h3><div id="eventLog" class="log"></div></div><div><h3>Chat</h3><div id="chatLog" class="log"></div></div></div>
+    </section>
+  </main>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/control.js"></script>
+</body>
+</html>
