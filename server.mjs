@@ -321,7 +321,7 @@ function applyCoins(data, coins, extra) {
     user: p.nickname,
     uniqueId: p.uniqueId,
     coins: Math.floor(coins),
-    giftName: getGiftName(data),
+    giftName: getGiftName(data).replace(/gift/gi, 'Drop'),
     repeatCount: Number(data?.repeatCount || 1),
     phase: state.phase,
     ...extra
@@ -708,7 +708,7 @@ function demoGift(body = {}) {
       profilePicture: { urls: [] }
     },
     giftId: 999,
-    giftDetails: { giftName: 'Demo Gift', giftType: 2, diamondCount: coins },
+    giftDetails: { giftName: 'Demo Drop', giftType: 2, diamondCount: coins },
     repeatCount,
     repeatEnd: true,
     giftExtra: { timestamp: Date.now() }

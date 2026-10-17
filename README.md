@@ -155,13 +155,19 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
 - **Tema warna** lewat URL: `?theme=blue` (default), `gold`, `pink`, `green`.
   Contoh: `https://DOMAIN/overlay/<token>?theme=gold&bg=black`
 - **Winner panel** dihias: sunburst emas berputar, mahkota, avatar dengan ring rainbow, sparkle berkedip, badge koin dan prize.
-- **Efek gift / coin bertambah** (skala 4 tingkat: <50, 50-199, 200-999, 1000+):
-  baris berkedip + bergetar, angka koin menghitung naik dengan pop, koin & bintang berhamburan, ripple, `+N` membesar,
-  banner gift (avatar, nama, jumlah, combo xN) muncul untuk SEMUA gifter termasuk yang di luar top 3,
-  gift besar membuat frame berkedip emas, gift 1000+ ditambah confetti dan suara berbeda.
-- **Gift >= 20 koin:** koin berpencar dari banner gift lalu terbang satu per satu masuk ke baris top; angka naik tiap koin tiba (500 koin ~1,6 dtk), ikon koin berdenyut tiap kedatangan.
-- **Efek gift bertingkat** (canvas, file `public/fx.js`):
-  - 20-99 koin: koin terbang satu per satu ke baris.
-  - **100+ BURST:** koin meledak ke segala arah lalu tersedot masuk ke baris, angka naik tiap koin tiba.
-  - **500+ GALAXY:** nebula ungu-pink-biru, bintang, galaksi spiral yang berputar lalu runtuh masuk ke baris.
-  - **1000+ NUKE:** alarm merah, rudal jatuh menghantam baris, flash putih, shockwave, bola api, awan jamur, koin berhamburan, layar bergetar; angka koin menjadi **rainbow** saat naik.
+- **Drop (gift) banner:** teks di atas username sekarang memakai kata **DROP** (bukan "gift"): `DROP`, `NICE DROP`, `SUPER DROP`, `BIG DROP`, `MEGA DROP`, `NUKE DROP`, `MONEY GUN DROP`, `GALAXY DROP`. Nama item dari TikTok yang mengandung kata "gift" juga diganti jadi "Drop" di log.
+- **Efek bertingkat** (canvas, `public/fx.js`; semakin banyak coin semakin heboh):
+  - 1-9 coin: koin kecil + ripple.
+  - **10+ STARS:** bintang berhamburan dari baris lalu tersedot balik.
+  - **20+ FOUNTAIN:** koin menyembur seperti air mancur + kolom cahaya.
+  - **35+ HEARTS:** hati pink melayang naik, hati & koin terbang masuk ke baris.
+  - **50+ CONFETTI:** dua meriam confetti di kiri-kanan.
+  - **100+ BURST:** koin meledak dengan trail + dua gelombang shockwave.
+  - **150+ THUNDER:** badai gelap, petir menyambar baris, koin terpental lalu masuk.
+  - **200+ FIREWORKS:** roket meledak warna-warni jadi hujan koin.
+  - **299+ NUKE:** rudal, flash, shockwave, awan jamur + asap, layar bergetar, angka rainbow.
+  - **500+ MONEY GUN (pink-ungu):** pistol uang pink/ungu meluncur masuk, menembakkan uang kertas pink-ungu bertubi-tubi ke frame pemain + glitter + hujan uang; angka coin naik tiap lembar masuk.
+  - **1000+ GALAXY:** nebula, galaksi spiral, bintang jatuh, runtuh masuk ke baris.
+  - **3000+ METEOR:** hujan meteor menghantam baris, tiap hantaman melempar koin.
+  - Jumlah partikel/durasi ikut membesar sesuai jumlah coin.
+  - Tombol preset demo di dashboard: +5, +25, +60, +120, +250, +299, +500, +1K.
