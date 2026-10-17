@@ -398,7 +398,7 @@ function render(s){
     let gap='';
     if(activePhase && i>0) gap=`<div class="gap-right">-${(users[0].coins-u.coins).toLocaleString()}<i class="coin red"></i></div>`;
     return `<div class="ov-row rank${i+1}${hit}" data-key="${esc(key)}" data-tier="${tier}" data-from="${cnt?cnt.cur:(prev??u.coins)}" data-to="${u.coins}" style="--sd:${sheenDelay(i+4)}"><div class="ov-rank"><div class="medal m${i+1}">${i+1}</div></div><img class="ov-avatar" src="${esc(avatar(u.avatar))}" alt=""><div class="ov-info"><div class="ov-name"><span class="nm">${esc(u.nickname)}</span>${star}</div><div class="ov-coins-wrap"><span class="ov-coins${(rainbowUntil.get(key)||0)>Date.now()?' rainbow-num':''}">${shown.toLocaleString()}</span><i class="coin"></i>${burst}</div></div>${gap}</div>`;
-  }).join(''):'<div class="ov-row empty-row"><div class="ov-info"><div class="ov-name">No bids yet</div><div class="sub">Send a gift to enter</div></div></div>';
+  }).join(''):'<div class="ov-row empty-row"><div class="ov-info"><div class="ov-name">No bids yet</div><div class="sub">Send a g!ft to enter</div></div></div>';
   for(const u of users) previousCoins.set(keyOf(u), u.coins);
   for(const key of [...previousCoins.keys()]) if(!seenKeys.has(key)) previousCoins.delete(key);
 
