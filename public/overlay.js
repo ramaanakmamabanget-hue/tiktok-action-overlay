@@ -322,7 +322,7 @@ function showGiftAlert(g,tier){
   $('giftAvatar').src=avatar(g.avatar);
   $('giftName').textContent=g.nickname||'';
   $('giftAmt').textContent='+'+combo.total.toLocaleString();
-  $('giftTag').textContent=t>=5?'☢ NUKE GIFT!!!':t===4?'✦ GALAXY GIFT!!':t===3?'BIG GIFT!':'GIFT';
+  $('giftTag').textContent=t>=5?'☢ NUKE DROP!!!':t===4?'✦ GALAXY DROP!!':t===3?'BIG DROP!':'DROP';
   const cb=$('giftCombo');
   cb.classList.remove('on'); cb.textContent='x'+combo.count;
   if(combo.count>1){ void cb.offsetWidth; cb.classList.add('on'); }
