@@ -171,3 +171,29 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
   - **3000+ METEOR:** hujan meteor menghantam baris, tiap hantaman melempar koin.
   - Jumlah partikel/durasi ikut membesar sesuai jumlah coin.
   - Tombol preset demo di dashboard: +5, +25, +60, +120, +250, +299, +500, +1K.
+
+## Theme 1 Classic v6 — Royal Neon (upgrade)
+- **Tampilan:** panel kaca gelap membulat, aksen emas + neon, cahaya berjalan mengelilingi frame utama (merah cepat saat Snipe), sayap hiasan di judul, timer besar + progress bar, meter di tiap baris.
+- **Teks berjalan (ticker):** info live (prize, leader, bonus waktu, daftar tier efek).
+- **Strip baru:** `LAST DROP` dan `BIGGEST DROP` (reset tiap ronde).
+- **Money Gun v2 (500+):** pistol baru (drum magazine, moncong emas), laser sight + target lock di frame pemain, muzzle flash kerucut, selongsong emas, asap, cincin impak, volley "cash-out" di akhir + teks `+N C`.
+- **BLACK HOLE (5000+, baru):** layar gelap, lensa gravitasi, accretion disk, semua koin/uang tersedot, collapse flash, lalu C menyembur ke baris pemain. Tombol demo `+6K black hole`.
+- **Galaxy (1000+) dan Meteor (3000+)** tetap efek asli. Tier 10-299 memakai efek poligon HEX PACK.
+- **Suara baru:** Money Gun (tembakan beruntun + ka-ching + hujan koin) dan Black Hole (rumble naik, implosi, chime).
+- **Istilah:** semua teks tampilan memakai `DROP` (bukan gift) dan `C` (bukan coins), di overlay maupun dashboard.
+- BlaxWhit tidak berubah.
+
+## v6.1 — Shark Attack + tanpa teks berjalan
+- **Teks berjalan (ticker) dihapus** supaya overlay lebih simpel.
+- **SHARK ATTACK (2100–2999 C, baru):** air naik dari bawah memenuhi frame + gelembung → hiu lewat (kiri→kanan atau sebaliknya, acak) → hiu hilang → **jumpscare**: hiu zoom ke layar, rahang menggigit, layar bergetar + flash merah → hilang → hiu menyambar super cepat melewati baris pemain (2x, arah berlawanan), koin terbang masuk dan angka C naik. Ada suara (motif dua nada, jeritan gigitan, whoosh).
+- Tombol demo baru: `+2.1K shark`. Tier lain tidak berubah (3000+ Meteor, 5000+ Black Hole).
+- **v6.2:** background semua frame (frame utama, baris leaderboard, chip, pill, winner) dibuat 90% transparan. Atur lewat variabel `--fa` di akhir `public/overlay-classic.css` (`.6` default sekarang, `.10` sangat transparan, `0` bening total).
+- **v6.3 — Chroma key:** background halaman default sekarang **hijau `#00ff00`** (sebelumnya biru tua yang ikut menghilangkan panel & neon biru). Panel memakai tint hitam netral. Angka intro 3-2-1 yang tadinya hijau diganti emas supaya tidak ikut ter-key. Pilihan lain: `?bg=blue`, `?bg=transparent` (OBS Browser Source, tanpa chroma), `?bg=hex`.
+- **v6.4:** teks "Auction hasn't started yet" diperbaiki: rata tengah dan lurus (sebelumnya terjebak di kolom sempit sehingga bergeser ke kiri).
+- **v6.5 — Efek 10–299 dirombak (tanpa hexagon):** Classic sekarang memakai koin asli (koin emas dengan huruf C, tepi bergerigi, berputar 3D) di semua efek. Efek hex (PRISM/JET/PENTA/PARTY/SHOCK/ARC/NOVA/CORE) tidak dipakai lagi.
+  - **Confetti 50+:** kertas, pita, streamer, bintang & bulatan warna-warni + ledakan moncong meriam 3 gelombang + hujan confetti dari atas.
+  - **Burst 100+:** sinar cahaya berputar, 3 gelombang kejut, garis percik, glitter, koin meledak lalu tersedot ke baris.
+  - **Nuke 299+:** rudal asli, ledakan putih, awan jamur bergumpal, gelombang kejut di tanah, hujan koin.
+  - Stars, Fountain, Hearts, Lightning, Fireworks diberi glitter berkelap-kelip. Suara Classic memakai set koin (bukan hex).
+
+- **v6.4 — Chroma biru tua:** background halaman default kembali **biru tua `#001a66`** (sebelumnya hijau `#00ff00`). Background frame/panel `--fa` dinaikkan ke `.8` (transparansi 0.2) supaya lebih gelap dan tidak tembus pandang. Pilihan lain: `?bg=green`, `?bg=black`, `?bg=transparent`, `?bg=hex`.

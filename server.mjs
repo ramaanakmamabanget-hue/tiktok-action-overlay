@@ -24,8 +24,23 @@ const defaultConfig = {
   drawMarginCoins: 0,
   prize: 'Prize #1',
   soundEnabled: true,
+  overlayTheme: 'classic',
   autoSave: false
 };
+
+// Overlay themes selectable from the control page (see public/overlay-blaxwhit.css).
+const OVERLAY_THEMES = ['classic', 'blaxwhit'];
+function normTheme(v) {
+  const t = String(v ?? '').toLowerCase();
+  return OVERLAY_THEMES.includes(t) ? t : 'classic';
+}
+
+// Gifts above this many coins add extra time in regular/snipe phase.
+const TIME_BONUS_MIN_COINS = 100;
+const TIME_BONUS_SECONDS = 8;
+// Extra tail after the timer hits 0: the overlay shows '2' for 1.5s and '1' for 2s
+// (instead of 1s each), so late gifts caused by stream delay still count.
+const COUNTDOWN_TAIL_MS = 1500;
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +53,7 @@ function createSession(sessionId, overlayToken, loadedConfig = {}) {
 const sessionFile = path.join(DATA_DIR, 'sessions', `${sessionId}.json`);
 let config = { ...defaultConfig, ...(loadedConfig || {}) };
 config.prize = String(config.prize ?? defaultConfig.prize);
+config.overlayTheme = normTheme(config.overlayTheme);
 if (!config.eulerApiKey) config.eulerApiKey = '';
 let activeConnectConfig = null;
 const room = `auction:${sessionId}`;
@@ -90,6 +106,7 @@ function sanitizeConfig(input) {
     drawMarginCoins: clampInt(input.drawMarginCoins, 0, 1_000_000),
     prize: String(input.prize ?? input.prizes?.['1'] ?? '').trim(),
     soundEnabled: input.soundEnabled === undefined ? (config.soundEnabled !== false) : Boolean(input.soundEnabled),
+    overlayTheme: normTheme(input.overlayTheme ?? config.overlayTheme),
     autoSave: Boolean(input.autoSave)
   };
 }
@@ -204,11 +221,14 @@ function publicState() {
     phase: state.phase,
     auctionId: state.auctionId,
     phaseEndsAt: state.phaseEndsAt,
+    countdownTailMs: COUNTDOWN_TAIL_MS,
     serverNow: Date.now(),
     remainingMs: Math.max(0, state.phaseEndsAt ? state.phaseEndsAt - Date.now() : 0),
     leaderboard: leaderboard(),
     totalParticipants: state.participants.size,
     lastGift: state.lastGift || null,
+    lastBonus: state.lastBonus || null,
+    timeBonus: { minCoins: TIME_BONUS_MIN_COINS, seconds: TIME_BONUS_SECONDS },
     winner: safeWinner(state.winner),
     winnerChat: state.winnerChat || '',
     prize: config.prize || '',
@@ -299,11 +319,9 @@ function ensureParticipant(data) {
   return p;
 }
 
-// Gifts above this many coins add extra time in regular/snipe phase.
-const TIME_BONUS_MIN_COINS = 100;
-const TIME_BONUS_SECONDS = 5;
 
 let giftSeq = 0;
+let bonusSeq = 0;
 function applyCoins(data, coins, extra) {
   if (!coins || coins <= 0 || !isAuctionAcceptingGifts()) return false;
   const p = ensureParticipant(data);
@@ -314,7 +332,9 @@ function applyCoins(data, coins, extra) {
   state.lastGift = { id: giftSeq, userId: p.userId, nickname: p.nickname, avatar: p.avatar || '', coins: Math.floor(coins), at: Date.now() };
   if (Math.floor(coins) > TIME_BONUS_MIN_COINS && (state.phase === 'regular' || state.phase === 'snipe')) {
     state.phaseEndsAt += TIME_BONUS_SECONDS * 1000;
-    addEventLog({ type: 'phase', phase: state.phase, message: `+${TIME_BONUS_SECONDS}s time bonus (${p.nickname}, ${Math.floor(coins)} coins).` });
+    bonusSeq += 1;
+    state.lastBonus = { id: bonusSeq, seconds: TIME_BONUS_SECONDS, nickname: p.nickname, at: Date.now() };
+    addEventLog({ type: 'phase', phase: state.phase, message: `+${TIME_BONUS_SECONDS}s time bonus (${p.nickname}, ${Math.floor(coins)} C).` });
   }
   addEventLog({
     type: 'gift',
@@ -401,7 +421,7 @@ function finalizeWinner() {
     state.phase = 'draw';
     state.drawStartedAt = Date.now();
     state.phaseEndsAt = Date.now() + config.drawSeconds * 1000;
-    addEventLog({ type: 'phase', phase: 'draw', message: `Draw started (${diff} coin gap).` });
+    addEventLog({ type: 'phase', phase: 'draw', message: `Draw started (${diff} C gap).` });
     broadcast();
     return;
   }
@@ -494,9 +514,9 @@ function phaseTicker() {
     state.phaseEndsAt = Date.now() + config.snipeSeconds * 1000;
     addEventLog({ type: 'phase', phase: 'snipe', message: 'Snipe phase started.' });
     broadcast();
-  } else if (state.phase === 'snipe' && Date.now() >= state.phaseEndsAt) {
+  } else if (state.phase === 'snipe' && Date.now() >= state.phaseEndsAt + COUNTDOWN_TAIL_MS) {
     finalizeWinner();
-  } else if (state.phase === 'draw' && Date.now() >= state.phaseEndsAt) {
+  } else if (state.phase === 'draw' && Date.now() >= state.phaseEndsAt + COUNTDOWN_TAIL_MS) {
     finishDraw();
   } else if (state.phase === 'idle' || state.phase === 'finished') {
     // no-op
@@ -913,12 +933,22 @@ app.post('/api/config', async (req, res) => {
     drawMarginCoins: clamp(input.drawMarginCoins, 0, 1_000_000),
     prize: String(input.prize ?? current.prize ?? defaultConfig.prize).trim() || defaultConfig.prize,
     soundEnabled: input.soundEnabled === undefined ? (current.soundEnabled !== false) : Boolean(input.soundEnabled),
+    overlayTheme: normTheme(input.overlayTheme ?? current.overlayTheme),
     autoSave: Boolean(input.autoSave)
   };
 
   // The factory exposes a mutable config through its getter, so update it
   // without touching the active TikTok connection.
   Object.assign(current, nextConfig);
+  await session.saveConfig();
+  session.broadcast();
+  res.json(session.publicState());
+});
+
+app.post('/api/theme', async (req, res) => {
+  const session = await routeControlSession(req);
+  if (!session) return res.status(401).json({ error: 'Session not found.' });
+  session.config.overlayTheme = normTheme(req.body?.overlayTheme);
   await session.saveConfig();
   session.broadcast();
   res.json(session.publicState());

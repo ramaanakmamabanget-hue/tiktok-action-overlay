@@ -1,0 +1,296 @@
+/* ============================================================
+   CLASSIC theme v5 — "Royal Neon"  (Theme 1)
+   Panel kaca gelap bersih, sudut membulat, aksen emas + neon.
+   Tanpa potongan hexagon. Hanya aktif saat skin BUKAN blaxwhit.
+   ============================================================ */
+:root:not([data-skin=blaxwhit]){
+  --cl-bg1:#0d1526; --cl-bg2:#03060c;
+  --cl-line:rgba(var(--n),.55);
+  --cl-gold1:#fff0a8; --cl-gold2:#ffc933; --cl-gold3:#c98a00;
+}
+
+/* ---------- panel dasar ---------- */
+:root:not([data-skin=blaxwhit]) .frame{
+  background:
+    radial-gradient(120% 90% at 50% -20%,rgba(var(--n),.16),transparent 60%),
+    linear-gradient(180deg,var(--cl-bg1),var(--cl-bg2));
+  border:1px solid var(--cl-line);
+  border-radius:18px;
+  box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 18px rgba(var(--n),.22),
+    inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.03);
+  animation:none;
+}
+:root:not([data-skin=blaxwhit]) .frame::before{
+  content:"";position:absolute;left:14px;right:14px;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);
+  opacity:.8;pointer-events:none;
+}
+/* sheen: tipis & halus, bukan gumpalan abu-abu */
+:root:not([data-skin=blaxwhit]) :is(.shiny,.shiny-soft)::after{
+  width:16%;opacity:.55;mix-blend-mode:normal;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.10) 45%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.10) 55%,transparent);
+}
+:root:not([data-skin=blaxwhit]) .shiny-soft::after{display:none}
+
+/* ---------- header: title / minimum / prize ---------- */
+:root:not([data-skin=blaxwhit]) .frame-title,
+:root:not([data-skin=blaxwhit]) .frame-min,
+:root:not([data-skin=blaxwhit]) .frame-prize{min-height:0}
+:root:not([data-skin=blaxwhit]) .frame-title{
+  padding:11px 16px;font-size:21px;font-weight:900;letter-spacing:.38em;text-indent:.38em;
+  color:transparent;background-clip:padding-box;
+}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle{
+  background:linear-gradient(180deg,#fff,#cfe9ff 55%,#8fc8f2);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 8px rgba(var(--n),.55));
+}
+:root:not([data-skin=blaxwhit]) .title-star{
+  background:linear-gradient(180deg,var(--cl-gold1),var(--cl-gold2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-right:10px;filter:drop-shadow(0 0 6px rgba(255,201,51,.8));
+}
+:root:not([data-skin=blaxwhit]) .frame-min{
+  padding:8px 14px;font-size:14px;font-weight:800;letter-spacing:.2em;color:#c9d9ea;
+  border-radius:14px;
+}
+:root:not([data-skin=blaxwhit]) .frame-min .check{filter:saturate(1.1)}
+:root:not([data-skin=blaxwhit]) .frame-prize{
+  padding:12px 16px;border-radius:18px;
+  border:1px solid rgba(255,201,51,.75);
+  background:
+    radial-gradient(120% 140% at 50% -40%,rgba(255,201,51,.22),transparent 62%),
+    linear-gradient(180deg,#171208,#05040a);
+  box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 20px rgba(255,201,51,.25),inset 0 1px 0 rgba(255,236,160,.35);
+}
+:root:not([data-skin=blaxwhit]) .frame-prize::before{
+  content:"PRIZE";position:static;display:block;height:auto;background:none;opacity:1;
+  font-size:10px;font-weight:900;letter-spacing:.42em;text-indent:.42em;color:var(--cl-gold2);margin-bottom:2px;text-align:center;
+}
+:root:not([data-skin=blaxwhit]) .frame-prize .rainbow-text{font-size:24px;letter-spacing:.04em}
+
+/* ---------- main frame + timer ---------- */
+:root:not([data-skin=blaxwhit]) .frame-main{padding:14px 14px 14px}
+:root:not([data-skin=blaxwhit]) .timer-head{
+  flex-direction:column;gap:2px;padding:2px 4px 14px;
+}
+:root:not([data-skin=blaxwhit]) .phase-label{
+  font-size:13px;font-weight:900;letter-spacing:.42em;text-indent:.42em;
+  text-shadow:0 0 12px currentColor;
+}
+:root:not([data-skin=blaxwhit]) .timer{
+  font-size:54px;font-weight:900;letter-spacing:.02em;color:#fff;line-height:1;
+  text-shadow:0 0 22px rgba(var(--ar),.75),0 2px 0 rgba(0,0,0,.6);
+}
+:root:not([data-skin=blaxwhit]) .draw .timer{color:var(--cl-gold1);text-shadow:0 0 22px rgba(255,201,51,.75)}
+:root:not([data-skin=blaxwhit]) .bw-bar{
+  display:block;position:relative;width:100%;height:5px;margin-top:10px;border-radius:99px;
+  background:rgba(255,255,255,.10);overflow:hidden;
+}
+:root:not([data-skin=blaxwhit]) .bw-bar i{
+  position:absolute;inset:0;border-radius:99px;transform-origin:left center;transform:scaleX(0);
+  transition:transform .2s linear;
+  background:linear-gradient(90deg,rgba(var(--n),.9),#fff);box-shadow:0 0 10px rgba(var(--n),.8);
+}
+:root:not([data-skin=blaxwhit]) .snipe .bw-bar{background:rgba(255,50,50,.18)}
+:root:not([data-skin=blaxwhit]) .snipe .bw-bar i{background:linear-gradient(90deg,#ff2a2a,#ff8a8a);box-shadow:0 0 12px rgba(255,42,42,.9)}
+
+/* ---------- baris pemain ---------- */
+:root:not([data-skin=blaxwhit]) .ov-rows{gap:10px}
+:root:not([data-skin=blaxwhit]) .ov-row{
+  min-height:76px;padding:10px 14px 12px;border-radius:16px;gap:12px;
+  grid-template-columns:34px 54px minmax(0,1fr);
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),linear-gradient(180deg,#0e1727,#060a12);
+  border:1px solid rgba(var(--n),.38);
+  box-shadow:0 3px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10);
+}
+:root:not([data-skin=blaxwhit]) .ov-row.rank1{
+  background:
+    linear-gradient(100deg,rgba(255,201,51,.26),rgba(255,201,51,.04) 55%),
+    linear-gradient(180deg,#1b1507,#0a0803);
+  border-color:rgba(255,201,51,.9);
+  box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 18px rgba(255,201,51,.28),inset 0 1px 0 rgba(255,236,160,.45);
+}
+:root:not([data-skin=blaxwhit]) .ov-row.rank2{border-color:rgba(205,220,240,.55)}
+:root:not([data-skin=blaxwhit]) .ov-row.rank3{border-color:rgba(255,140,80,.5)}
+:root:not([data-skin=blaxwhit]) .snipe .ov-row:not(.rank1){border-color:rgba(255,60,60,.55)}
+
+/* medali = lencana bulat bersih (tanpa pita) */
+:root:not([data-skin=blaxwhit]) .medal{
+  width:32px;height:32px;border-radius:50%;font-size:17px;font-weight:900;border-width:2px;
+  display:flex;align-items:center;justify-content:center;
+}
+:root:not([data-skin=blaxwhit]) .medal::before,
+:root:not([data-skin=blaxwhit]) .medal::after{display:none}
+:root:not([data-skin=blaxwhit]) .medal.m1{box-shadow:0 0 12px rgba(255,201,51,.75)}
+:root:not([data-skin=blaxwhit]) .medal.m2{box-shadow:0 0 10px rgba(220,230,245,.45)}
+:root:not([data-skin=blaxwhit]) .medal.m3{box-shadow:0 0 10px rgba(255,125,60,.5)}
+
+:root:not([data-skin=blaxwhit]) .ov-avatar{width:54px;height:54px;border-width:2px}
+:root:not([data-skin=blaxwhit]) .ov-name{font-size:18px;font-weight:800;letter-spacing:.01em}
+:root:not([data-skin=blaxwhit]) .ov-coins{
+  font-size:25px;
+  background:linear-gradient(180deg,#fff6c4,#ffcf3d 60%,#e6a100);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:none;filter:drop-shadow(0 0 8px rgba(255,201,51,.35));
+}
+:root:not([data-skin=blaxwhit]) .ov-coins.rainbow-num{color:transparent}
+:root:not([data-skin=blaxwhit]) .gap-right{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;gap:6px;font-size:14px;font-weight:900;color:#ff6b6b;
+}
+
+/* meter tipis di dasar baris */
+:root:not([data-skin=blaxwhit]) .bw-meter{
+  display:block;position:absolute;left:14px;right:14px;bottom:5px;height:3px;border-radius:99px;
+  background:rgba(255,255,255,.08);z-index:2;
+}
+:root:not([data-skin=blaxwhit]) .bw-meter::after{
+  content:"";position:absolute;inset:0;border-radius:99px;transform-origin:left;transform:scaleX(var(--p,0));
+  transition:transform .5s cubic-bezier(.2,.9,.2,1);
+  background:linear-gradient(90deg,rgba(var(--n),.9),rgba(var(--n),.4));
+}
+:root:not([data-skin=blaxwhit]) .rank1 .bw-meter::after{background:linear-gradient(90deg,#ffc933,#fff0a8)}
+:root:not([data-skin=blaxwhit]) .placeholder .bw-meter::after{opacity:0}
+:root:not([data-skin=blaxwhit]) .placeholder{opacity:.7}
+
+/* ---------- participants ---------- */
+:root:not([data-skin=blaxwhit]) .participants{margin-top:12px}
+:root:not([data-skin=blaxwhit]) .pill{
+  padding:7px 18px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  background:linear-gradient(180deg,#0e1727,#060a12);border:1px solid rgba(var(--n),.45);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1);
+}
+:root:not([data-skin=blaxwhit]) .pill::after{display:none}
+
+/* ---------- snipe: seluruh frame utama merah ---------- */
+:root:not([data-skin=blaxwhit]) .snipe .frame-main{
+  border-color:rgba(255,60,60,.9);
+  background:radial-gradient(120% 90% at 50% -20%,rgba(255,40,40,.28),transparent 60%),linear-gradient(180deg,#220a0d,#080204);
+  box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 26px rgba(255,42,42,.5),inset 0 1px 0 rgba(255,150,150,.3);
+}
+:root:not([data-skin=blaxwhit]) .snipe .timer{color:#ff5a5a;text-shadow:0 0 24px rgba(255,42,42,.95)}
+
+/* ---------- winner ---------- */
+:root:not([data-skin=blaxwhit]) .winner-panel{
+  border-color:rgba(255,201,51,.95);
+  background:radial-gradient(100% 70% at 50% 0%,rgba(255,201,51,.22),transparent 65%),linear-gradient(180deg,#1a1408,#05040a);
+  box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 30px rgba(255,201,51,.4),inset 0 1px 0 rgba(255,236,160,.5);
+}
+:root:not([data-skin=blaxwhit]) .wbadge{
+  border-radius:999px;border:1px solid rgba(255,201,51,.6);
+  background:linear-gradient(180deg,#171208,#07050a);clip-path:none;
+}
+:root:not([data-skin=blaxwhit]) .wbadge.prize{border-color:rgba(var(--n),.7)}
+:root:not([data-skin=blaxwhit]) .winner-chat{border-radius:12px;border:1px solid rgba(var(--n),.45);background:#070c14}
+
+/* ---------- banner drop & overtaken ---------- */
+:root:not([data-skin=blaxwhit]) .gift-alert{
+  border-radius:16px;border:1px solid rgba(255,201,51,.8);
+  background:linear-gradient(180deg,#171208,#05040a);
+  box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 22px rgba(255,201,51,.35),inset 0 1px 0 rgba(255,236,160,.4);
+}
+:root:not([data-skin=blaxwhit]) .overtaken{
+  border-radius:14px;border:1px solid rgba(255,60,60,.85);
+  background:linear-gradient(180deg,#2a0a0e,#0a0204);
+  box-shadow:0 0 22px rgba(255,42,42,.5);
+}
+
+/* ============================================================
+   v5 extras: teks berjalan, strip drop, cahaya berjalan, hiasan
+   ============================================================ */
+@property --clang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes clSpin{to{--clang:360deg}}
+@keyframes clTick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes clFlash{0%{filter:brightness(2.4);transform:scale(1.06)}100%{filter:none;transform:none}}
+
+/* cahaya yang berjalan mengelilingi frame utama */
+:root:not([data-skin=blaxwhit]) .frame-main::after{
+  content:"";position:absolute;inset:0;border-radius:18px;padding:2px;pointer-events:none;z-index:6;
+  background:conic-gradient(from var(--clang),transparent 0 62%,rgba(var(--n),.95) 80%,#fff 88%,rgba(var(--n),.95) 94%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:clSpin 5s linear infinite;
+}
+:root:not([data-skin=blaxwhit]) .snipe .frame-main::after{
+  background:conic-gradient(from var(--clang),transparent 0 55%,#ff2a2a 78%,#fff 88%,#ff2a2a 95%,transparent 100%);animation-duration:1.6s;
+}
+/* sayap di kiri-kanan judul */
+:root:not([data-skin=blaxwhit]) .frame-title{position:relative}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle{position:relative}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle::before,
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle::after{
+  content:"";position:absolute;top:50%;width:46px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(var(--n),.9));
+}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle::before{right:calc(100% + 26px)}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle::after{left:calc(100% + 8px);transform:scaleX(-1)}
+
+/* kilau emas di baris #1 */
+:root:not([data-skin=blaxwhit]) .ov-row.rank1::after{
+  background:linear-gradient(100deg,transparent,rgba(255,236,160,.28) 50%,transparent);width:30%;opacity:.8;mix-blend-mode:screen;
+}
+
+/* strip LAST DROP / BIGGEST DROP */
+:root:not([data-skin=blaxwhit]) .drop-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+:root:not([data-skin=blaxwhit]) .ds-chip{
+  min-width:0;padding:6px 10px 7px;border-radius:12px;text-align:center;
+  background:linear-gradient(180deg,#0e1727,#060a12);border:1px solid rgba(var(--n),.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1);
+}
+:root:not([data-skin=blaxwhit]) .ds-chip.gold{border-color:rgba(255,201,51,.65);background:linear-gradient(180deg,#171208,#07050a)}
+:root:not([data-skin=blaxwhit]) .ds-chip small{display:block;font-size:9px;font-weight:900;letter-spacing:.3em;text-indent:.3em;color:#8fb1c8}
+:root:not([data-skin=blaxwhit]) .ds-chip.gold small{color:var(--cl-gold2)}
+:root:not([data-skin=blaxwhit]) .ds-chip b{display:block;margin-top:2px;font-size:12px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root:not([data-skin=blaxwhit]) .ds-chip.gold b{color:var(--cl-gold1)}
+:root:not([data-skin=blaxwhit]) .ds-chip b.flash{animation:clFlash .5s ease-out}
+
+:root:not([data-skin=blaxwhit]) .gift-alert.k-shark{border-color:#bfeaff;background:linear-gradient(180deg,#06304f,#020d1c);box-shadow:0 0 34px rgba(60,190,255,.95),0 0 60px rgba(0,110,220,.6),inset 0 0 18px rgba(130,220,255,.4)}
+:root:not([data-skin=blaxwhit]) .gift-alert.k-shark .ga-amt{color:#9fe8ff;text-shadow:0 0 16px rgba(60,200,255,.95)}
+
+/* banner drop baru: Black Hole */
+:root:not([data-skin=blaxwhit]) .gift-alert.k-blackhole{
+  border-color:#d9c2ff;background:linear-gradient(180deg,#120628,#020006);
+  box-shadow:0 0 34px rgba(150,80,255,.95),0 0 60px rgba(255,150,50,.5),inset 0 0 18px rgba(190,120,255,.4);
+}
+:root:not([data-skin=blaxwhit]) .gift-alert.k-blackhole .ga-amt{color:#ffc27a;text-shadow:0 0 16px rgba(255,140,40,.95)}
+:root:not([data-skin=blaxwhit]) .gift-alert.k-moneygun{border-color:#ffb3ec;box-shadow:0 0 30px rgba(255,59,212,.95),0 0 56px rgba(160,60,255,.6),inset 0 0 18px rgba(255,120,230,.38)}
+:root:not([data-skin=blaxwhit]) .ov-row:not(.rank1)::after{opacity:.3;width:22%}
+:root:not([data-skin=blaxwhit]) .frame-title #overlayTitle::before{right:calc(100% + 40px)}
+
+/* ============================================================
+   v6.2 — background frame nyaris transparan (90% transparan)
+   --fa = alpha (kepekatan) background. 1 = hitam solid, 0.8 = 20% tembus pandang, 0 = bening total.
+   v6.4: --fa .8 (transparansi 0.2) -> gelap & tidak tembus pandang
+   ============================================================ */
+:root:not([data-skin=blaxwhit]){ --fa:.8; --fa-tint:rgba(0,0,0,var(--fa)); }
+:root:not([data-skin=blaxwhit]) .frame,
+:root:not([data-skin=blaxwhit]) .ov-row,
+:root:not([data-skin=blaxwhit]) .pill,
+:root:not([data-skin=blaxwhit]) .ds-chip,
+:root:not([data-skin=blaxwhit]) .wbadge,
+:root:not([data-skin=blaxwhit]) .winner-chat{ background:var(--fa-tint); }
+:root:not([data-skin=blaxwhit]) .ds-chip.gold,
+:root:not([data-skin=blaxwhit]) .wbadge{ background:rgba(40,28,4,var(--fa)); }
+:root:not([data-skin=blaxwhit]) .ov-row.rank1{ background:linear-gradient(100deg,rgba(255,201,51,.10),rgba(255,201,51,0) 55%),var(--fa-tint); }
+:root:not([data-skin=blaxwhit]) .snipe .frame-main{ background:rgba(40,6,10,var(--fa)); }
+:root:not([data-skin=blaxwhit]) .winner-panel{ background:rgba(40,28,4,var(--fa)); }
+/* bayangan gelap dihilangkan (tersisa glow neon) + teks diberi bayangan tipis supaya tetap terbaca */
+:root:not([data-skin=blaxwhit]) .frame,
+:root:not([data-skin=blaxwhit]) .ov-row{ box-shadow:0 0 14px rgba(var(--n),.22); }
+:root:not([data-skin=blaxwhit]) .frame,
+:root:not([data-skin=blaxwhit]) .ov-row,
+:root:not([data-skin=blaxwhit]) .ds-chip,
+:root:not([data-skin=blaxwhit]) .pill,
+:root:not([data-skin=blaxwhit]) .winner-panel{ text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 8px rgba(0,0,0,.5); }
+
+/* v6.4 — "Auction hasn't started yet": 1 kolom penuh, teks rata tengah & lurus (sebelumnya terjebak di kolom 34px) */
+:root:not([data-skin=blaxwhit]) .ov-row.empty-row{
+  display:flex;align-items:center;justify-content:center;grid-template-columns:none;
+  min-height:76px;padding:10px 16px;text-align:center;
+}
+:root:not([data-skin=blaxwhit]) .ov-row.empty-row .ov-info{flex:0 1 auto;min-width:0;width:100%}
+:root:not([data-skin=blaxwhit]) .ov-row.empty-row .ov-name{
+  justify-content:center;text-align:center;width:100%;font-size:17px;letter-spacing:.06em;text-transform:uppercase;
+  white-space:normal;line-height:1.2;
+}
