@@ -263,7 +263,7 @@
    --fa = alpha (kepekatan) background. 1 = hitam solid, 0.8 = 20% tembus pandang, 0 = bening total.
    v6.4: --fa .8 (transparansi 0.2) -> gelap & tidak tembus pandang
    ============================================================ */
-:root:not([data-skin=blaxwhit]){ --fa:.8; --fa-tint:rgba(0,0,0,var(--fa)); }
+:root:not([data-skin=blaxwhit]){ --fa:.5; --fa-tint:rgba(0,0,0,var(--fa)); }
 :root:not([data-skin=blaxwhit]) .frame,
 :root:not([data-skin=blaxwhit]) .ov-row,
 :root:not([data-skin=blaxwhit]) .pill,
