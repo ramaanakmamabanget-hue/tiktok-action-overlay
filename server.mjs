@@ -29,7 +29,7 @@ const defaultConfig = {
 };
 
 // Overlay themes selectable from the control page (see public/overlay-blaxwhit.css).
-const OVERLAY_THEMES = ['classic', 'blaxwhit'];
+const OVERLAY_THEMES = ['classic', 'blaxwhit', 'aurora'];
 function normTheme(v) {
   const t = String(v ?? '').toLowerCase();
   return OVERLAY_THEMES.includes(t) ? t : 'classic';
@@ -205,6 +205,15 @@ function leaderboard() {
     .map(participantPayload);
 }
 
+function otherParticipants() {
+  const top = new Set(leaderboard().map((p) => p.userId));
+  return [...state.participants.values()]
+    .filter((p) => !top.has(p.userId))
+    .sort((a, b) => b.coins - a.coins || b.lastGiftAt - a.lastGiftAt)
+    .slice(0, 6)
+    .map((p) => ({ userId: p.userId, nickname: p.nickname, avatar: p.avatar || '' }));
+}
+
 function leaderByRank() {
   return leaderboard();
 }
@@ -226,6 +235,7 @@ function publicState() {
     remainingMs: Math.max(0, state.phaseEndsAt ? state.phaseEndsAt - Date.now() : 0),
     leaderboard: leaderboard(),
     totalParticipants: state.participants.size,
+    otherParticipants: otherParticipants(),
     lastGift: state.lastGift || null,
     lastBonus: state.lastBonus || null,
     timeBonus: { minCoins: TIME_BONUS_MIN_COINS, seconds: TIME_BONUS_SECONDS },

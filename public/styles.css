@@ -35,7 +35,7 @@
 
 /* ---------- Overlay theme picker (bottom of control page) ---------- */
 .theme-panel{grid-column:1/-1}
-.theme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .theme-card{display:flex;align-items:center;gap:16px;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:#0b0f17;color:#fff;transition:border-color .15s,transform .15s,box-shadow .15s}
 .theme-card:hover{transform:translateY(-1px);border-color:#4a5775}
 .theme-card.active{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 10px 30px rgba(116,247,164,.12)}
@@ -55,4 +55,8 @@
 .thumb-bw i:nth-child(1)::after{display:none}
 .thumb-bw i:nth-child(2),.thumb-bw i:nth-child(3){clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .thumb-bw i:nth-child(3){background:#777}
-@media(max-width:650px){.theme-grid{grid-template-columns:1fr}}
+/* thumbnail Theme 3 — Aurora */
+.thumb-aurora{background:linear-gradient(135deg,#1b0f4a,#0a2a5e)}
+.thumb-aurora i{background:rgba(255,255,255,.08);border-radius:99px;border:1.5px solid transparent;background:linear-gradient(#150c3a,#150c3a) padding-box,linear-gradient(110deg,#00f5d4,#9b5de5,#f15bb5) border-box}
+.thumb-aurora i:nth-child(1){flex:.8}
+@media(max-width:900px){.theme-grid{grid-template-columns:1fr}}

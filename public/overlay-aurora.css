@@ -1,0 +1,226 @@
+/* ============================================================
+   Theme 3 — AURORA GLASS
+   Kaca buram (frosted) super membulat, tepi aurora yang mengalir,
+   gelembung cahaya melayang di dalam panel, avatar bulat dengan
+   cincin berputar, baris berbentuk kapsul. Snipe = aurora merah.
+   Aktif hanya saat <html data-skin="aurora">.
+   ============================================================ */
+@property --aang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes auSpin{to{--aang:360deg}}
+@keyframes auFlow{from{background-position:0% 50%}to{background-position:300% 50%}}
+@keyframes auDrift1{0%,100%{transform:translate(-12%,-8%) scale(1)}50%{transform:translate(18%,12%) scale(1.25)}}
+@keyframes auDrift2{0%,100%{transform:translate(14%,10%) scale(1.15)}50%{transform:translate(-16%,-12%) scale(.9)}}
+@keyframes auIn{0%{opacity:0;transform:translateY(-18px) scale(.94);filter:blur(10px)}100%{opacity:1;transform:none;filter:none}}
+@keyframes auRise{0%{opacity:0;transform:translateY(26px) scale(.96);filter:blur(8px)}100%{opacity:1;transform:none;filter:none}}
+@keyframes auBreath{0%,100%{opacity:.75}50%{opacity:1}}
+@keyframes auTwinkle{0%,100%{transform:scale(.8) rotate(0);opacity:.7}50%{transform:scale(1.25) rotate(90deg);opacity:1}}
+
+:root[data-skin=aurora]{
+  --n:155,120,255;--ar:0,229,255;--light:#d9ccff;
+  --au-grad:linear-gradient(110deg,#00f5d4,#00bbf9,#9b5de5,#f15bb5,#00f5d4);
+  --au-glass:rgba(16,10,44,.58);
+  --au-glass-2:rgba(255,255,255,.055);
+  --au-line:rgba(255,255,255,.16);
+  --au-ink:#f4f0ff;
+  --au-mint:#7cf5e0;
+}
+:root[data-skin=aurora] .overlay-body{--a1:#00f5d4;--a2:#9b5de5;--a3:#f15bb5;--a4:#00bbf9}
+:root[data-skin=aurora] .overlay-body.snipe{--a1:#ff2d55;--a2:#ff7a3d;--a3:#ff2d95;--a4:#b0003a;
+  --au-grad:linear-gradient(110deg,#ff2d55,#ff7a3d,#ff2d95,#ff2d55)}
+:root[data-skin=aurora] .overlay-root{gap:11px}
+
+/* ---------- panel kaca + tepi aurora ---------- */
+:root[data-skin=aurora] .frame{
+  background:var(--au-glass);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+  border:0;border-radius:26px;
+  box-shadow:0 10px 30px rgba(5,0,30,.45),0 0 26px rgba(var(--n),.22);
+  color:var(--au-ink);
+}
+:where(:root[data-skin=aurora]) :is(.frame-title,.frame-min,.frame-prize,.frame-main){animation:none}
+:root[data-skin=aurora] .frame::before{display:none}
+:root[data-skin=aurora] .frame::after,
+:root[data-skin=aurora] .shiny::after,
+:root[data-skin=aurora] .shiny-soft::after{
+  content:"";display:block;position:absolute;inset:0;width:auto;height:auto;top:0;bottom:0;left:0;
+  border-radius:inherit;padding:1.5px;pointer-events:none;z-index:6;opacity:1;mix-blend-mode:normal;transform:none;
+  background:var(--au-grad);background-size:300% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:auFlow 7s linear infinite;
+}
+:root[data-skin=aurora] .timer-head{overflow:visible}
+:root[data-skin=aurora] .timer-head::after{display:none}
+
+/* gelembung cahaya melayang di dalam panel utama */
+:root[data-skin=aurora] .frame-main{isolation:isolate;padding:18px 14px 14px}
+:root[data-skin=aurora] .frame-main::before{
+  display:block;content:"";position:absolute;inset:-30%;z-index:-1;border-radius:0;pointer-events:none;opacity:.55;
+  background:
+    radial-gradient(34% 30% at 25% 30%,var(--a2),transparent 70%),
+    radial-gradient(30% 28% at 78% 24%,var(--a1),transparent 70%),
+    radial-gradient(34% 30% at 70% 80%,var(--a3),transparent 70%);
+  filter:blur(22px);animation:auDrift1 11s ease-in-out infinite;
+}
+:root[data-skin=aurora] .frame-main::after{animation-duration:7s}
+:root[data-skin=aurora] .snipe .frame-main::after,
+:root[data-skin=aurora] .overlay-body.snipe .frame-main::after{animation-duration:1.4s}
+
+/* ---------- title ---------- */
+:root[data-skin=aurora] .frame-title{padding:12px 20px;font-size:20px;font-weight:800;letter-spacing:.5em;text-indent:.5em;gap:12px}
+:root[data-skin=aurora] .frame-title #overlayTitle{
+  background:var(--au-grad);background-size:300% 100%;animation:auFlow 6s linear infinite;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:none;
+  filter:drop-shadow(0 0 10px rgba(var(--n),.6));
+}
+:root[data-skin=aurora] .title-star{
+  font-size:16px;color:var(--au-mint);filter:drop-shadow(0 0 8px rgba(0,245,212,.9));display:inline-block;
+  animation:auTwinkle 2.6s ease-in-out infinite;text-shadow:none;margin-right:0;
+}
+
+/* ---------- minimum ---------- */
+:root[data-skin=aurora] .frame-min{min-height:0;padding:7px 16px;font-size:12px;font-weight:700;letter-spacing:.3em;color:#cfc4f5;border-radius:999px}
+:root[data-skin=aurora] .check{width:20px;height:20px;border-radius:50%;font-size:12px;background:var(--au-grad);color:#0b0820;box-shadow:0 0 10px rgba(0,245,212,.6)}
+:root[data-skin=aurora] .check.coin-mode{background:none;box-shadow:none;width:auto;height:auto}
+
+/* ---------- prize ---------- */
+:root[data-skin=aurora] .frame-prize{min-height:0;padding:11px 20px;gap:12px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),transparent),var(--au-glass)}
+:root[data-skin=aurora] .frame-prize::before{
+  display:inline-block;content:"PRIZE";position:static;inset:auto;height:auto;border-radius:999px;
+  padding:4px 11px;font-size:10px;font-weight:900;letter-spacing:.3em;text-indent:.3em;color:#0b0820;
+  background:var(--au-grad);background-size:300% 100%;animation:auFlow 6s linear infinite;
+}
+:root[data-skin=aurora] .rainbow-text{
+  font-size:19px;font-weight:800;letter-spacing:.03em;text-shadow:none;filter:none;
+  background-image:linear-gradient(100deg,#fff,#b9f6ff,#fff,#e6d4ff,#fff);background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  animation:auFlow 5s linear infinite;
+}
+
+/* ---------- timer ---------- */
+:root[data-skin=aurora] .timer-head{flex-direction:column;gap:3px;padding:0 4px 16px}
+:root[data-skin=aurora] .phase-label{font-size:12px;font-weight:800;letter-spacing:.5em;text-indent:.5em;text-shadow:none;color:var(--au-mint)}
+:root[data-skin=aurora] .snipe .phase-label{color:#ff6b8a;font-size:12px}
+:root[data-skin=aurora] .draw .phase-label{color:#ffd23f}
+:root[data-skin=aurora] .timer{
+  font-size:58px;font-weight:800;line-height:1;letter-spacing:-.01em;
+  background:linear-gradient(180deg,#fff 20%,#cdb9ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(var(--n),.7));text-shadow:none;
+}
+:root[data-skin=aurora] .snipe .timer{font-size:58px;background-image:linear-gradient(180deg,#fff 10%,#ff8aa0);filter:drop-shadow(0 0 20px rgba(255,45,85,.9))}
+:root[data-skin=aurora] .draw .timer{background-image:linear-gradient(180deg,#fff7c9,#ffc933);filter:drop-shadow(0 0 18px rgba(255,201,51,.75))}
+:root[data-skin=aurora] .bw-bar{display:block;position:relative;width:100%;height:7px;margin-top:12px;border-radius:99px;background:rgba(255,255,255,.12);overflow:visible}
+:root[data-skin=aurora] .bw-bar i{
+  position:absolute;inset:0;border-radius:99px;transform-origin:left center;transform:scaleX(0);transition:transform .2s linear;
+  background:var(--au-grad);background-size:300% 100%;animation:auFlow 3s linear infinite;box-shadow:0 0 14px rgba(var(--n),.9);
+}
+:root[data-skin=aurora] .bw-bar i::after{
+  content:"";position:absolute;right:-5px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;
+  background:#fff;box-shadow:0 0 12px 3px rgba(255,255,255,.9),0 0 22px 6px rgba(var(--n),.8);
+}
+
+/* ---------- baris pemain: kapsul ---------- */
+:root[data-skin=aurora] .ov-rows{gap:10px}
+:root[data-skin=aurora] .ov-row{
+  min-height:78px;padding:10px 18px 12px 12px;border-radius:999px;gap:10px;
+  grid-template-columns:30px 58px minmax(0,1fr) auto;
+  background:linear-gradient(180deg,var(--au-glass-2),rgba(255,255,255,.012)),rgba(10,6,30,.5);
+  border:1px solid var(--au-line);box-shadow:0 4px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
+}
+:root[data-skin=aurora] .ov-row::after{display:none}
+:root[data-skin=aurora] .ov-row.rank1{
+  min-height:88px;border-color:transparent;
+  background:linear-gradient(100deg,rgba(0,245,212,.16),rgba(155,93,229,.16) 55%,rgba(241,91,181,.14)),rgba(14,8,40,.62);
+  box-shadow:0 6px 20px rgba(0,0,0,.35),0 0 24px rgba(var(--n),.45);
+}
+:root[data-skin=aurora] .ov-row.rank1::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:3;
+  background:var(--au-grad);background-size:300% 100%;animation:auFlow 5s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+}
+:root[data-skin=aurora] .ov-row.rank2{border-color:rgba(205,225,255,.4)}
+:root[data-skin=aurora] .ov-row.rank3{border-color:rgba(255,170,120,.38)}
+:root[data-skin=aurora] .snipe .ov-row:not(.rank1){border-color:rgba(255,70,100,.4)}
+
+/* medali: permata bulat */
+:root[data-skin=aurora] .ov-rank{width:30px;height:auto}
+:root[data-skin=aurora] .medal{width:28px;height:28px;font-size:14px;font-weight:900;border:0;box-shadow:inset 0 -3px 5px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,255,255,.55),0 0 12px rgba(255,255,255,.18)}
+:root[data-skin=aurora] .medal::before,:root[data-skin=aurora] .medal::after{display:none}
+:root[data-skin=aurora] .medal.m1{background:linear-gradient(135deg,#fff3a6,#ffb800);color:#5a3a00;-webkit-text-fill-color:#5a3a00;box-shadow:inset 0 -3px 5px rgba(120,70,0,.35),inset 0 2px 3px rgba(255,255,255,.7),0 0 16px rgba(255,200,40,.85)}
+:root[data-skin=aurora] .medal.m2{background:linear-gradient(135deg,#ffffff,#b9c6dd);color:#2a3550;-webkit-text-fill-color:#2a3550}
+:root[data-skin=aurora] .medal.m3{background:linear-gradient(135deg,#ffc9a3,#e0733a);color:#4a1d00;-webkit-text-fill-color:#4a1d00}
+
+/* avatar bulat + cincin aurora berputar */
+:root[data-skin=aurora] .avw{display:block;position:relative;width:58px;height:58px}
+:root[data-skin=aurora] .avw::before{
+  content:"";position:absolute;inset:-3px;border-radius:50%;
+  background:conic-gradient(from var(--aang),var(--a1),var(--a4),var(--a2),var(--a3),var(--a1));
+  animation:auSpin 4s linear infinite;box-shadow:0 0 14px rgba(var(--n),.5);
+}
+:root[data-skin=aurora] .rank1 .avw{width:66px;height:66px}
+:root[data-skin=aurora] .rank1 .avw::before{inset:-4px;animation-duration:2.4s}
+:root[data-skin=aurora] .ov-avatar{position:relative;width:100%;height:100%;border:2.5px solid #120a30;border-radius:50%;box-shadow:none;background:#1a1240;filter:none}
+:root[data-skin=aurora] .rank1 .ov-avatar{border-color:#120a30;box-shadow:none}
+:root[data-skin=aurora] .ov-avatar.q{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#8f84c4}
+:root[data-skin=aurora] .ov-row.rank1{grid-template-columns:30px 66px minmax(0,1fr) auto}
+
+:root[data-skin=aurora] .ov-name{font-size:18px;font-weight:700;letter-spacing:.01em;color:var(--au-ink)}
+:root[data-skin=aurora] .ov-name .star{color:#ffd966;filter:drop-shadow(0 0 6px rgba(255,217,102,.9))}
+:root[data-skin=aurora] .ov-coins:not(.rainbow-num){
+  font-size:26px;font-weight:800;
+  background:linear-gradient(180deg,#fff,#a9f7ec 70%,#6fe0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  text-shadow:none;filter:drop-shadow(0 0 8px rgba(0,229,255,.35));
+}
+:root[data-skin=aurora] .rank1 .ov-coins:not(.rainbow-num){font-size:30px;background-image:linear-gradient(180deg,#fff,#ffe9a6 70%,#ffc933);filter:drop-shadow(0 0 10px rgba(255,201,51,.4))}
+:root[data-skin=aurora] .gap-right{font-size:14px;font-weight:800;color:#ff8fb3;text-shadow:none;position:static;transform:none;display:flex;align-items:center;gap:5px}
+
+/* meter tipis di dasar kapsul */
+:root[data-skin=aurora] .bw-meter{display:block;position:absolute;left:84px;right:26px;bottom:7px;height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
+:root[data-skin=aurora] .bw-meter::after{content:"";position:absolute;inset:0;border-radius:99px;transform-origin:left;transform:scaleX(var(--p,0));transition:transform .5s cubic-bezier(.2,.9,.2,1);background:var(--au-grad);background-size:300% 100%;animation:auFlow 5s linear infinite}
+:root[data-skin=aurora] .placeholder{opacity:.6}
+:root[data-skin=aurora] .placeholder .bw-meter::after{opacity:0}
+:root[data-skin=aurora] .placeholder .avw::before{animation:none;background:rgba(255,255,255,.15);box-shadow:none}
+
+:root[data-skin=aurora] .ov-row.empty-row{display:flex;align-items:center;justify-content:center;border-radius:28px;min-height:76px;text-align:center}
+:root[data-skin=aurora] .ov-row.empty-row .ov-name{justify-content:center;text-transform:uppercase;letter-spacing:.1em;font-size:15px;white-space:normal}
+
+/* ---------- participants ---------- */
+:root[data-skin=aurora] .participants{margin-top:14px}
+:root[data-skin=aurora] .pill{
+  padding:7px 18px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#d9ccff;
+  background:rgba(255,255,255,.07);border:1px solid var(--au-line);gap:9px;
+}
+:root[data-skin=aurora] .pill::after{display:none}
+:root[data-skin=aurora] .part-av{border-color:#120a30;border-width:2px;width:22px;height:22px}
+:root[data-skin=aurora] .part-more{color:var(--au-mint)}
+:root[data-skin=aurora] .people::before,:root[data-skin=aurora] .people::after{background:var(--au-mint)}
+
+/* ---------- snipe ---------- */
+:root[data-skin=aurora] .snipe .frame-main{box-shadow:0 10px 30px rgba(5,0,30,.45),0 0 34px rgba(255,45,85,.55)}
+:root[data-skin=aurora] .snipe .frame-main::before{opacity:.7}
+
+/* ---------- winner ---------- */
+:root[data-skin=aurora] .winner-panel{border-radius:30px;background:linear-gradient(180deg,rgba(255,200,60,.12),transparent 45%),var(--au-glass);box-shadow:0 12px 36px rgba(0,0,0,.5),0 0 40px rgba(var(--n),.5)}
+:root[data-skin=aurora] .winner-kicker{color:#ffe08a}
+:root[data-skin=aurora] .winner-panel strong{text-shadow:none;background-image:var(--au-grad);background-size:300% 100%}
+:root[data-skin=aurora] .wbadge{background:rgba(255,255,255,.07);border:1px solid var(--au-line);box-shadow:none;color:#ffe08a}
+:root[data-skin=aurora] .wbadge.prize{color:#fff}
+:root[data-skin=aurora] .wbadge.prize .rainbow-text{font-size:15px}
+:root[data-skin=aurora] .winner-chat{border-radius:16px;border:1px solid var(--au-line);background:rgba(8,4,28,.6)}
+:root[data-skin=aurora] .winner-chat-copy{border-radius:16px;border-color:var(--au-line);background:rgba(255,255,255,.08);color:#fff}
+
+/* ---------- banner drop & overtaken ---------- */
+:root[data-skin=aurora] .gift-alert{background:rgba(14,8,40,.86);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+:root[data-skin=aurora] .overtaken{border-radius:22px;background:rgba(40,4,20,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+
+/* ---------- intro: panel muncul berurutan ---------- */
+:root[data-skin=aurora] .overlay-root.bw-intro .frame-title{animation:auIn .8s .05s cubic-bezier(.2,.8,.2,1) both}
+:root[data-skin=aurora] .overlay-root.bw-intro .frame-prize{animation:auIn .8s .2s cubic-bezier(.2,.8,.2,1) both}
+:root[data-skin=aurora] .overlay-root.bw-intro .frame-min{animation:auIn .8s .35s cubic-bezier(.2,.8,.2,1) both}
+:root[data-skin=aurora] .overlay-root.bw-intro .stack{animation:auRise .9s .5s cubic-bezier(.2,.8,.2,1) both}
+
+@media (prefers-reduced-motion:reduce){
+  :root[data-skin=aurora] *{animation-duration:0s !important}
+}

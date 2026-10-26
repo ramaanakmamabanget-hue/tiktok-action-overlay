@@ -100,10 +100,10 @@
 :root[data-skin=blaxwhit] .medal.m1,:root[data-skin=blaxwhit] .medal.m2,:root[data-skin=blaxwhit] .medal.m3{background:none;border:0;color:inherit}
 :root[data-skin=blaxwhit] .rank1 .medal.m1{color:#000;-webkit-text-fill-color:#000}
 
-/* avatar: hexagon, grayscale */
+/* avatar: hexagon, full colour */
 :root[data-skin=blaxwhit] .avw{display:block;width:54px;height:54px;filter:drop-shadow(1.5px 0 0 var(--ring)) drop-shadow(-1.5px 0 0 var(--ring)) drop-shadow(0 1.5px 0 var(--ring)) drop-shadow(0 -1.5px 0 var(--ring))}
 :root[data-skin=blaxwhit] .rank1 .avw{width:62px;height:62px}
-:root[data-skin=blaxwhit] .ov-avatar{width:100%;height:100%;border:0 !important;border-radius:0;box-shadow:none !important;clip-path:var(--bw-hex);filter:grayscale(1) contrast(1.06);background:#111}
+:root[data-skin=blaxwhit] .ov-avatar{width:100%;height:100%;border:0 !important;border-radius:0;box-shadow:none !important;clip-path:var(--bw-hex);filter:none;background:#111}
 :root[data-skin=blaxwhit] .ov-avatar.q{display:flex;align-items:center;justify-content:center;filter:none;font-size:26px;font-weight:300;color:#8a8a8a;background:#0c0c0c}
 
 /* text */
@@ -130,9 +130,12 @@
 
 /* participants: plain caption */
 :root[data-skin=blaxwhit] .participants{margin-top:14px}
-:root[data-skin=blaxwhit] .pill{background:none;border:0;border-radius:0;padding:0;font-size:12px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:#8f8f8f;clip-path:none;box-shadow:none}
+:root[data-skin=blaxwhit] .pill{background:none;border:0;border-radius:0;padding:0;font-size:12px;font-weight:600;letter-spacing:.2em;white-space:nowrap;text-transform:uppercase;color:#8f8f8f;clip-path:none;box-shadow:none}
 :root[data-skin=blaxwhit] .pill::before,:root[data-skin=blaxwhit] .pill::after{display:none}
 :root[data-skin=blaxwhit] .people{opacity:.7}
+:root[data-skin=blaxwhit] .pill{display:inline-flex;align-items:center;gap:10px}
+:root[data-skin=blaxwhit] .part-av{border-color:#fff;width:20px;height:20px;clip-path:none;filter:none}
+:root[data-skin=blaxwhit] .part-more{color:#fff;letter-spacing:.04em}
 
 /* ---------- SNIPE: red ---------- */
 :root[data-skin=blaxwhit] .snipe .phase-label{color:var(--bw-red);font-weight:800;font-size:18px;text-shadow:0 0 16px rgba(255,31,45,.85);animation:labelBlink .5s steps(2,end) infinite}

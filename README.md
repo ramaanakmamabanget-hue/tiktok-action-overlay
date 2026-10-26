@@ -188,12 +188,10 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
 - **SHARK ATTACK (2100–2999 C, baru):** air naik dari bawah memenuhi frame + gelembung → hiu lewat (kiri→kanan atau sebaliknya, acak) → hiu hilang → **jumpscare**: hiu zoom ke layar, rahang menggigit, layar bergetar + flash merah → hilang → hiu menyambar super cepat melewati baris pemain (2x, arah berlawanan), koin terbang masuk dan angka C naik. Ada suara (motif dua nada, jeritan gigitan, whoosh).
 - Tombol demo baru: `+2.1K shark`. Tier lain tidak berubah (3000+ Meteor, 5000+ Black Hole).
 - **v6.2:** background semua frame (frame utama, baris leaderboard, chip, pill, winner) dibuat 90% transparan. Atur lewat variabel `--fa` di akhir `public/overlay-classic.css` (`.6` default sekarang, `.10` sangat transparan, `0` bening total).
-- **v6.3 — Chroma key:** background halaman default sekarang **hijau `#00ff00`** (sebelumnya biru tua yang ikut menghilangkan panel & neon biru). Panel memakai tint hitam netral. Angka intro 3-2-1 yang tadinya hijau diganti emas supaya tidak ikut ter-key. Pilihan lain: `?bg=blue`, `?bg=transparent` (OBS Browser Source, tanpa chroma), `?bg=hex`.
+- **v6.3 — Chroma key:** background halaman default dikembalikan ke **biru tua `#001a66`** (v6.3 sempat hijau `#00ff00`; pakai `?bg=00ff00` untuk hijau) (sebelumnya biru tua yang ikut menghilangkan panel & neon biru). Panel memakai tint hitam netral. Angka intro 3-2-1 yang tadinya hijau diganti emas supaya tidak ikut ter-key. Pilihan lain: `?bg=blue`, `?bg=transparent` (OBS Browser Source, tanpa chroma), `?bg=hex`.
 - **v6.4:** teks "Auction hasn't started yet" diperbaiki: rata tengah dan lurus (sebelumnya terjebak di kolom sempit sehingga bergeser ke kiri).
 - **v6.5 — Efek 10–299 dirombak (tanpa hexagon):** Classic sekarang memakai koin asli (koin emas dengan huruf C, tepi bergerigi, berputar 3D) di semua efek. Efek hex (PRISM/JET/PENTA/PARTY/SHOCK/ARC/NOVA/CORE) tidak dipakai lagi.
   - **Confetti 50+:** kertas, pita, streamer, bintang & bulatan warna-warni + ledakan moncong meriam 3 gelombang + hujan confetti dari atas.
   - **Burst 100+:** sinar cahaya berputar, 3 gelombang kejut, garis percik, glitter, koin meledak lalu tersedot ke baris.
   - **Nuke 299+:** rudal asli, ledakan putih, awan jamur bergumpal, gelombang kejut di tanah, hujan koin.
   - Stars, Fountain, Hearts, Lightning, Fireworks diberi glitter berkelap-kelip. Suara Classic memakai set koin (bukan hex).
-
-- **v6.4 — Chroma biru tua:** background halaman default kembali **biru tua `#001a66`** (sebelumnya hijau `#00ff00`). Background frame/panel `--fa` dinaikkan ke `.8` (transparansi 0.2) supaya lebih gelap dan tidak tembus pandang. Pilihan lain: `?bg=green`, `?bg=black`, `?bg=transparent`, `?bg=hex`.

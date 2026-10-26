@@ -472,7 +472,6 @@ function showGiftAlert(g,tier){
 }
 function onGift(g){
   const tier=tierOf(g.coins);
-  try{ dropNote(g); }catch(e){}
   play(kindOf(g.coins)==='moneygun'?'moneygun':kindOf(g.coins)==='blackhole'?'blackhole':({shark:'shark',meteor:'meteor',galaxy:'galaxy',moneygun:'moneygun',nuke:'nuke',fireworks:'fireworks',lightning:'lightning',burst:'big',confetti:'confetti',hearts:'hearts',fountain:'coin2',stars:'stars',coin:'coin'}[kindOf(g.coins)]), g.coins);
   showGiftAlert(g,tier);
   const st=$('stack');
@@ -488,10 +487,10 @@ function showOvertaken(name){
   $('overtakenName').textContent=`${name} takes #1`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
-// Overlay skin (Theme 1 = classic, Theme 2 = blaxwhit). ?skin=blaxwhit in the URL overrides the saved one.
+// Overlay skin (Theme 1 = classic, Theme 2 = blaxwhit, Theme 3 = aurora). ?skin=blaxwhit in the URL overrides the saved one.
 function applySkin(t){
   const q=(new URLSearchParams(location.search).get('skin')||'').toLowerCase();
-  const v=['classic','blaxwhit'].includes(q)?q:(t==='blaxwhit'?'blaxwhit':'classic');
+  const v=['classic','blaxwhit','aurora'].includes(q)?q:(['blaxwhit','aurora'].includes(t)?t:'classic');
   if(document.documentElement.dataset.skin!==v){ document.documentElement.dataset.skin=v; if(typeof FX!=='undefined') FX.sprites=null; }
 }
 let lastBonusId;
@@ -500,15 +499,6 @@ function showBonus(sec){
   el.textContent=`+${sec}s`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   play('bonus');
-}
-/* LAST DROP / BIGGEST DROP chips (reset every auction) */
-let dropBig={n:0,name:''}, dropLast=null;
-function dropReset(){ dropBig={n:0,name:''}; dropLast=null; const a=$('dsLast'),b=$('dsBig'); if(a) a.textContent='—'; if(b) b.textContent='—'; }
-function dropNote(g){
-  const a=$('dsLast'),b=$('dsBig'); if(!a||!b) return;
-  const n=Number(g.coins)||0, nm=String(g.nickname||'');
-  a.textContent=`${nm} +${n.toLocaleString()} C`; a.classList.remove('flash'); void a.offsetWidth; a.classList.add('flash');
-  if(n>dropBig.n){ dropBig={n,name:nm}; b.textContent=`${nm} ${n.toLocaleString()} C`; b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash'); }
 }
 // header "assembles" on load and again whenever an auction starts (BlaxWhit)
 function playHeaderIntro(){
@@ -525,9 +515,19 @@ function runIntro(){
     try{play('tick',true)}catch{}
   },i*600));
 }
+/* small avatars of participants outside the top 3; max 5 shown, rest collapses to "+N" */
+let partAvKey='';
+function renderPartAvatars(list,othersCount){
+  const box=$('partAvs'); if(!box) return;
+  const MAX=5, shown=list.slice(0,MAX), more=Math.max(0,othersCount-shown.length);
+  const key=shown.map(p=>p.userId+'|'+p.avatar).join(',')+'#'+more;
+  if(key===partAvKey) return; partAvKey=key;
+  box.innerHTML=shown.map(p=>`<img class="part-av" src="${esc(avatar(p.avatar))}" alt="">`).join('')+(more>0?`<b class="part-more">+${more}</b>`:'');
+  box.style.display=shown.length||more?'':'none';
+}
 function render(s){
   state=s; serverOffset=(s.serverNow||Date.now())-Date.now();
-  if(lastAuctionId!==null && s.auctionId!==lastAuctionId){ previousCoins.clear(); prevTopKey=null; try{ dropReset(); }catch(e){} }
+  if(lastAuctionId!==null && s.auctionId!==lastAuctionId){ previousCoins.clear(); prevTopKey=null; }
   lastAuctionId=s.auctionId;
   const prevPhase=lastPhase; lastPhase=s.phase;
   document.body.className=`overlay-body ${s.phase}`;
@@ -542,13 +542,14 @@ function render(s){
   if(min>0){ minText.textContent=`MINIMUM: ${min.toLocaleString()}`; minIcon.className='check coin-mode'; minIcon.innerHTML='<i class="coin"></i>'; }
   else { minText.textContent='NO MINIMUM'; minIcon.className='check'; minIcon.textContent='✔'; }
 
-  $('prizeText').textContent=String(s.prize||'').trim()||'Prize #1';
+  { const pz=String(s.prize||'').trim()||'Prize #1'; const pe=$('prizeText'); pe.textContent=pz; pe.dataset.text=pz; }
   fitPrize();
 
   const phaseLabel=s.phase==='regular'?'REGULAR TIME':s.phase==='snipe'?'SNIPE TIME':s.phase==='draw'?'DRAW TIME':s.phase==='finished'?(s.winner?'WINNER':'DRAW'):'WAITING';
   $('phaseLabel').textContent=phaseLabel;
   const total=Number(s.totalParticipants ?? (s.leaderboard||[]).length);
   $('participantsText').textContent=`Total participants: ${total}`;
+  renderPartAvatars(s.otherParticipants||[], total-(s.leaderboard||[]).length);
 
   const users=s.leaderboard||[];
   const activePhase=s.phase==='regular'||s.phase==='snipe'||s.phase==='draw';
@@ -624,7 +625,7 @@ function render(s){
     $('winnerName').textContent=s.winner.nickname || 'Unknown';
     $('winnerCoins').textContent=s.winner.coins.toLocaleString();
     $('winnerAvatar').src=avatar(s.winner.avatar);
-    $('winnerPrize').textContent=String(s.prize||'').trim()||'Prize #1';
+    { const wp=String(s.prize||'').trim()||'Prize #1'; const we=$('winnerPrize'); we.textContent=wp; we.dataset.text=wp; }
     syncWinnerChat(s.winner, s.chatLog || [], s.winnerChat || '', s.winnerChatMeta || {});
   } else {
     winnerPanel.classList.add('hidden');
