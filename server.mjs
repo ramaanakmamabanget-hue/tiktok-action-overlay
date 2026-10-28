@@ -25,6 +25,8 @@ const defaultConfig = {
   prize: 'Prize #1',
   soundEnabled: true,
   overlayTheme: 'classic',
+  prizeMode: 'text',
+  spinHoldSeconds: 8,
   autoSave: false
 };
 
@@ -33,6 +35,45 @@ const OVERLAY_THEMES = ['classic', 'blaxwhit', 'aurora'];
 function normTheme(v) {
   const t = String(v ?? '').toLowerCase();
   return OVERLAY_THEMES.includes(t) ? t : 'classic';
+}
+
+function normPrizeMode(v) {
+  return String(v ?? '').toLowerCase() === 'spin' ? 'spin' : 'text';
+}
+
+// ---- Spin RBX (ported from Open Robux Chest) --------------------------------
+const SPIN_VALUES = [10, 25, 50, 100, 500];
+const SPIN_SECRET_CHANCE = 0.15;
+function randSpinWeights() {
+  const idx = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+  const h = Math.random() < 0.35 ? 2 : 1;
+  const w = Array(5).fill(4);
+  let rem = 80;
+  for (let k = 0; k < h; k++) {
+    const v = h === 2 ? 31 + Math.floor(Math.random() * 8) : 31 + Math.floor(Math.random() * 20);
+    w[idx[k]] = v;
+    rem -= v - 4;
+  }
+  const o = idx.slice(h);
+  const c = Array.from({ length: o.length - 1 }, () => Math.floor(Math.random() * (rem + 1))).sort((a, b) => a - b);
+  const p = [0, ...c, rem];
+  o.forEach((j, i) => { w[j] += p[i + 1] - p[i]; });
+  return w;
+}
+function makeSpinPlan() {
+  const sec = Math.random() < SPIN_SECRET_CHANCE;
+  const weights = sec ? Array.from({ length: 5 }, () => 31 + Math.floor(Math.random() * 30)) : randSpinWeights();
+  const secretPct = sec ? (Math.random() < 0.65 ? 31 + Math.floor(Math.random() * 20) : 10 + Math.floor(Math.random() * 21)) : 0;
+  let win;
+  if (secretPct && Math.random() * 100 < secretPct) {
+    win = 1000;
+  } else {
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    win = SPIN_VALUES[0];
+    for (let i = 0; i < 5; i++) { r -= weights[i]; if (r < 0) { win = SPIN_VALUES[i]; break; } }
+  }
+  return { values: SPIN_VALUES, weights, secretPct, win };
 }
 
 // Gifts above this many coins add extra time in regular/snipe phase.
@@ -49,11 +90,14 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '256kb' }));
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
-function createSession(sessionId, overlayToken, loadedConfig = {}) {
+function createSession(sessionId, overlayToken, loadedConfig = {}, spinToken = newToken()) {
 const sessionFile = path.join(DATA_DIR, 'sessions', `${sessionId}.json`);
 let config = { ...defaultConfig, ...(loadedConfig || {}) };
 config.prize = String(config.prize ?? defaultConfig.prize);
 config.overlayTheme = normTheme(config.overlayTheme);
+config.prizeMode = normPrizeMode(config.prizeMode);
+config.spinHoldSeconds = clampInt(config.spinHoldSeconds ?? 8, 3, 120);
+let spinSeq = 0;
 if (!config.eulerApiKey) config.eulerApiKey = '';
 let activeConnectConfig = null;
 const room = `auction:${sessionId}`;
@@ -76,7 +120,8 @@ const state = {
   winner: null,
   drawStartedAt: 0,
   lastGiftAt: 0,
-  winnerChat: ''
+  winnerChat: '',
+  spin: null
 };
 
 // Anti-duplicate bookkeeping. These maps are reset for every new auction.
@@ -107,13 +152,15 @@ function sanitizeConfig(input) {
     prize: String(input.prize ?? input.prizes?.['1'] ?? '').trim(),
     soundEnabled: input.soundEnabled === undefined ? (config.soundEnabled !== false) : Boolean(input.soundEnabled),
     overlayTheme: normTheme(input.overlayTheme ?? config.overlayTheme),
+    prizeMode: normPrizeMode(input.prizeMode ?? config.prizeMode),
+    spinHoldSeconds: clampInt(input.spinHoldSeconds ?? config.spinHoldSeconds, 3, 120),
     autoSave: Boolean(input.autoSave)
   };
 }
 
 async function saveConfig() {
   await fs.mkdir(path.dirname(sessionFile), { recursive: true });
-  const persisted = { ...config, controlId: sessionId, overlayToken };
+  const persisted = { ...config, controlId: sessionId, overlayToken, spinToken };
   await fs.writeFile(sessionFile, JSON.stringify(persisted, null, 2), 'utf8');
 }
 
@@ -227,6 +274,8 @@ function publicState() {
   return {
     sessionId,
     overlayToken,
+    spinToken,
+    spin: state.spin,
     phase: state.phase,
     auctionId: state.auctionId,
     phaseEndsAt: state.phaseEndsAt,
@@ -241,7 +290,7 @@ function publicState() {
     timeBonus: { minCoins: TIME_BONUS_MIN_COINS, seconds: TIME_BONUS_SECONDS },
     winner: safeWinner(state.winner),
     winnerChat: state.winnerChat || '',
-    prize: config.prize || '',
+    prize: config.prizeMode === 'spin' ? 'SPIN RBX' : (config.prize || ''),
     config: publicConfig,
     connection: connectionState,
     eventLog: eventLog.slice(-40),
@@ -414,6 +463,13 @@ function handleGift(data) {
   applyCoins(data, giftCoins * repeatCount, { streak: false, repeatEnd: true });
 }
 
+function planSpin() {
+  state.spin = null;
+  if (!state.winner || config.prizeMode !== 'spin') return;
+  spinSeq += 1;
+  state.spin = { seq: spinSeq, auctionId: state.auctionId, ...makeSpinPlan() };
+}
+
 function finalizeWinner() {
   const top = leaderByRank();
   const first = top[0];
@@ -437,6 +493,7 @@ function finalizeWinner() {
   }
   state.winner = state.participants.get(first.userId) || first;
   primeWinnerChat();
+  planSpin();
   state.phase = 'finished';
   state.phaseEndsAt = 0;
   addEventLog({ type: 'winner', winner: first.nickname, coins: first.coins });
@@ -463,6 +520,7 @@ function finishDraw() {
     }
   }
   if (state.winner) primeWinnerChat();
+  planSpin();
   state.phase = 'finished';
   state.phaseEndsAt = 0;
   broadcast();
@@ -473,6 +531,7 @@ function startAuction() {
   state.participants.clear();
   state.winner = null;
   state.winnerChat = '';
+  state.spin = null;
   state.phase = 'regular';
   state.startedAt = Date.now();
   state.phaseEndsAt = state.startedAt + config.regularSeconds * 1000;
@@ -494,6 +553,7 @@ function resetAuction() {
   state.participants.clear();
   state.winner = null;
   state.winnerChat = '';
+  state.spin = null;
   state.drawStartedAt = 0;
   state.lastGiftAt = 0;
   state.lastGift = null;
@@ -509,6 +569,7 @@ function reloadSnipe() {
     // Winner announced or no bidders: go back to snipe, keep participants/coins.
     state.winner = null;
     state.winnerChat = '';
+    state.spin = null;
     state.drawStartedAt = 0;
     state.phase = 'snipe';
   } else if (state.phase !== 'snipe') return false;
@@ -725,6 +786,17 @@ function scheduleReconnect() {
 
 
 
+function testSpin() {
+  const fakeAvatar = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="300" height="300" fill="#3a2f6b"/><circle cx="150" cy="115" r="55" fill="#fff" opacity=".85"/><ellipse cx="150" cy="260" rx="95" ry="80" fill="#fff" opacity=".85"/></svg>');
+  spinSeq += 1;
+  io.to(room).emit('spin:test', {
+    winner: { nickname: 'Demo Winner', avatar: fakeAvatar },
+    spin: { seq: spinSeq, auctionId: -1, ...makeSpinPlan() },
+    soundEnabled: config.soundEnabled !== false,
+    holdSeconds: config.spinHoldSeconds
+  });
+}
+
 function demoGift(body = {}) {
   if (!isAuctionAcceptingGifts()) return { ok: false, error: 'Auction is not accepting gifts.' };
   const name = String(body.name || 'DemoUser');
@@ -750,8 +822,10 @@ function demoGift(body = {}) {
 return {
   id: sessionId,
   overlayToken,
+  spinToken,
   room,
   publicState,
+  testSpin,
   broadcast,
   connectTikTok,
   startAuction,
@@ -772,6 +846,7 @@ return {
 
 const sessions = new Map();
 const overlayIndex = new Map();
+const spinIndex = new Map();
 
 function validSessionId(value) {
   return SESSION_ID_RE.test(String(value || ''));
@@ -817,6 +892,7 @@ async function loadPersistedSession(sessionId) {
   const parsed = await readSessionFile(sessionId);
   if (!parsed) return null;
   const overlayToken = String(parsed.overlayToken || '').trim().toLowerCase();
+  const spinToken = String(parsed.spinToken || '').trim().toLowerCase();
   const config = {
     ...defaultConfig,
     ...parsed,
@@ -824,7 +900,9 @@ async function loadPersistedSession(sessionId) {
   };
   delete config.controlId;
   delete config.overlayToken;
+  delete config.spinToken;
   return {
+    spinToken: SESSION_ID_RE.test(spinToken) ? spinToken : newToken(),
     overlayToken: SESSION_ID_RE.test(overlayToken) ? overlayToken : newToken(),
     config
   };
@@ -836,9 +914,10 @@ async function getOrCreateSession(sessionId) {
   if (session) return session;
   const persisted = await loadPersistedSession(sessionId);
   const overlayToken = persisted?.overlayToken || newToken();
-  session = createSession(sessionId, overlayToken, persisted?.config || defaultConfig);
+  session = createSession(sessionId, overlayToken, persisted?.config || defaultConfig, persisted?.spinToken || newToken());
   sessions.set(sessionId, session);
   overlayIndex.set(overlayToken, sessionId);
+  spinIndex.set(session.spinToken, sessionId);
   return session;
 }
 
@@ -866,12 +945,37 @@ async function getSessionByOverlayToken(token) {
   return null;
 }
 
+async function getSessionBySpinToken(token) {
+  const normalized = String(token || '').trim().toLowerCase();
+  if (!validSessionId(normalized)) return null;
+  const knownId = spinIndex.get(normalized);
+  if (knownId) return getOrCreateSession(knownId);
+  for (const sess of sessions.values()) if (sess.spinToken === normalized) return sess;
+  const dir = path.join(DATA_DIR, 'sessions');
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      const controlId = entry.name.slice(0, -5);
+      if (!validSessionId(controlId)) continue;
+      const parsed = JSON.parse(await fs.readFile(path.join(dir, entry.name), 'utf8'));
+      if (String(parsed?.spinToken || '').trim().toLowerCase() === normalized) {
+        const session = await getOrCreateSession(controlId);
+        spinIndex.set(normalized, controlId);
+        return session;
+      }
+    }
+  } catch {}
+  return null;
+}
+
 async function createNewSession() {
   const id = newToken();
   const overlayToken = newToken();
   const session = createSession(id, overlayToken, { ...defaultConfig });
   sessions.set(id, session);
   overlayIndex.set(overlayToken, id);
+  spinIndex.set(session.spinToken, id);
   return session;
 }
 
@@ -900,6 +1004,8 @@ app.get('/api/session', async (req, res) => {
   res.json({
     sessionId: session.id,
     overlayToken: session.overlayToken,
+    spinToken: session.spinToken,
+    spinUrl: `/spin/${session.spinToken}`,
     controlUrl: `/control/${session.id}`,
     overlayUrl: `/overlay/${session.overlayToken}`
   });
@@ -944,6 +1050,8 @@ app.post('/api/config', async (req, res) => {
     prize: String(input.prize ?? current.prize ?? defaultConfig.prize).trim() || defaultConfig.prize,
     soundEnabled: input.soundEnabled === undefined ? (current.soundEnabled !== false) : Boolean(input.soundEnabled),
     overlayTheme: normTheme(input.overlayTheme ?? current.overlayTheme),
+    prizeMode: normPrizeMode(input.prizeMode ?? current.prizeMode),
+    spinHoldSeconds: clamp(input.spinHoldSeconds ?? current.spinHoldSeconds ?? 8, 3, 120),
     autoSave: Boolean(input.autoSave)
   };
 
@@ -953,6 +1061,13 @@ app.post('/api/config', async (req, res) => {
   await session.saveConfig();
   session.broadcast();
   res.json(session.publicState());
+});
+
+app.post('/api/spin/test', async (req, res) => {
+  const session = await routeControlSession(req);
+  if (!session) return res.status(401).json({ error: 'Session not found.' });
+  session.testSpin();
+  res.json({ ok: true });
 });
 
 app.post('/api/theme', async (req, res) => {
@@ -1036,15 +1151,24 @@ app.get('/overlay/:overlayToken', async (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'overlay.html'));
 });
 
+app.get('/spin/:spinToken', async (req, res) => {
+  const session = await getSessionBySpinToken(req.params.spinToken);
+  if (!session) return res.status(404).send('Invalid spin overlay URL.');
+  res.sendFile(path.join(__dirname, 'public', 'spin.html'));
+});
+
 io.use(async (socket, next) => {
   try {
     const controlId = String(socket.handshake.auth?.sessionId || socket.handshake.query?.sessionId || '');
     const overlayToken = String(socket.handshake.auth?.overlayToken || socket.handshake.query?.overlayToken || '');
+    const spinToken = String(socket.handshake.auth?.spinToken || socket.handshake.query?.spinToken || '');
     let session = null;
     if (validSessionId(controlId)) {
       session = await getOrCreateSession(controlId);
     } else if (validSessionId(overlayToken)) {
       session = await getSessionByOverlayToken(overlayToken);
+    } else if (validSessionId(spinToken)) {
+      session = await getSessionBySpinToken(spinToken);
     }
     if (!session) return next(new Error('Invalid or missing session token.'));
     socket.data.auctionSession = session;

@@ -31,6 +31,12 @@
         <label>Minimum C<input id="minimumCoins" type="number" min="0"></label>
         <label>Draw margin (C)<input id="drawMarginCoins" type="number" min="0"></label>
         <label class="full">Prize<input id="prize" placeholder="e.g. 500 Robux"></label>
+        <label>Prize mode<select id="prizeMode"><option value="text">Text (hadiah dari kolom Prize)</option><option value="spin">Spin RBX (overlay spin terpisah)</option></select></label>
+        <label>Spin result tampil (detik)<input id="spinHoldSeconds" type="number" min="3" max="120" value="8"></label>
+        <div class="full spin-link-box"><small class="field-help">Link overlay Spin (browser source terpisah, background hijau chroma):</small>
+          <div style="display:flex;gap:8px;margin-top:6px"><input id="spinUrl" readonly style="flex:1"><button type="button" class="secondary" id="copySpinBtn">Copy</button><button type="button" class="secondary" id="testSpinBtn">Test spin</button></div>
+          <div id="spinTestResult" class="muted" style="margin-top:8px">Klik Test spin untuk melihat hasil prize.</div>
+          <div class="preview-wrap"><div class="preview-title">Spin preview</div><iframe id="spinFrame" title="Spin overlay preview" style="background:#00ff00"></iframe></div></div>
         <label class="autosave-toggle"><input id="soundEnabled" type="checkbox" checked><span>Sound</span><small>Overlay sound effects (drop, tick, winner)</small></label>
         <label class="autosave-toggle"><input id="autoSave" type="checkbox"><span>Auto Save</span><small>Automatically save setup changes</small></label>
         <div class="full actions-row"><button class="primary" id="saveBtn" type="submit">Save</button><button class="secondary" id="connectBtn" type="button">Connect</button><button class="danger" id="resetBtn" type="button">Reset Round</button><button class="secondary" id="reloadSnipeBtn" type="button">RELOAD SNIPE</button></div>

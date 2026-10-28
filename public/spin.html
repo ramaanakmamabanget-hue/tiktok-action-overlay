@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spin RBX Overlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/spin.css">
+</head><body>
+<div id="stage" class="stage hidden">
+  <div class="who" id="who">
+    <div class="av-wrap"><img id="wAv" class="av" alt=""></div>
+    <div class="wkick">WINNER</div>
+    <div class="wname" id="wName"></div>
+    <div class="wprize" id="wPrize">PRIZE: ???</div>
+  </div>
+  <div class="cd hidden" id="cd"></div>
+  <div class="panel hidden" id="panel">
+    <div class="chips" id="chips"></div>
+    <div class="vp" id="vp"><div class="strip" id="strip"></div><div class="line" id="line"></div></div>
+    <div class="secret" id="secret"><b>SECRET</b><div class="sp" id="sp">0%</div></div>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/secret-fx.js"></script>
+<script src="/spin.js"></script>
+</body></html>

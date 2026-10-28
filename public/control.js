@@ -34,6 +34,8 @@ function fillSettings(c) {
   $('minimumCoins').value = c.minimumCoins;
   $('drawMarginCoins').value = c.drawMarginCoins;
   $('prize').value = c.prize || c.prizes?.['1'] || '';
+  $('prizeMode').value = c.prizeMode === 'spin' ? 'spin' : 'text';
+  $('spinHoldSeconds').value = c.spinHoldSeconds || 8;
   const snd = $('soundEnabled'); if (snd) snd.checked = c.soundEnabled !== false;
   autoSaveEnabled = Boolean(c.autoSave);
   const toggle = $('autoSave');
@@ -71,6 +73,7 @@ function render(s) {
       overlayFrame.dataset.sessionOverlay = overlayUrl;
     }
   }
+  if (s.spinToken) { const u = `${location.origin}/spin/${s.spinToken}`; if ($('spinUrl').value !== u) { $('spinUrl').value = u; $('spinFrame').src = u; } }
   if (s.config) fillSettings(s.config);
   markTheme(s.config?.overlayTheme);
   const status = s.connection?.status || 'disconnected';
@@ -108,6 +111,8 @@ $('settingsForm').addEventListener('submit', async (e)=>{
     minimumCoins: $('minimumCoins').value,
     drawMarginCoins: $('drawMarginCoins').value,
     prize: $('prize').value,
+    prizeMode: $('prizeMode').value,
+    spinHoldSeconds: $('spinHoldSeconds').value,
     soundEnabled: $('soundEnabled')?.checked ?? true,
     autoSave: $('autoSave')?.checked ?? autoSaveEnabled
   };
@@ -129,6 +134,8 @@ function collectConfig() {
     minimumCoins: $('minimumCoins').value,
     drawMarginCoins: $('drawMarginCoins').value,
     prize: $('prize').value,
+    prizeMode: $('prizeMode').value,
+    spinHoldSeconds: $('spinHoldSeconds').value,
     soundEnabled: $('soundEnabled')?.checked ?? true,
     autoSave: $('autoSave')?.checked ?? autoSaveEnabled
   };
@@ -151,7 +158,7 @@ function queueAutoSave() {
   }, 650);
 }
 
-document.querySelectorAll('#settingsForm input').forEach((el) => {
+document.querySelectorAll('#settingsForm input:not(#spinUrl), #settingsForm select').forEach((el) => {
   el.addEventListener('input', queueAutoSave);
   el.addEventListener('change', queueAutoSave);
 });
@@ -179,3 +186,11 @@ socket.on('auction:state', render);
 socket.on('auction:tick', t=>{ $('countdown').textContent = fmtTime((t.phaseEndsAt || 0) - (Date.now())); });
 socket.on('chat:message', m=>{ if(latest){ latest.chatLog=[...(latest.chatLog||[]),m].slice(-60); renderLogs(latest.eventLog, latest.chatLog); }});
 fetch('/api/state').then(r=>r.json()).then(render);
+
+$('copySpinBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('spinUrl').value); } catch { $('spinUrl').select(); document.execCommand('copy'); } $('copySpinBtn').textContent = 'Copied ✓'; setTimeout(() => { $('copySpinBtn').textContent = 'Copy'; }, 1000); });
+$('testSpinBtn').addEventListener('click', () => fetch('/api/spin/test', { method: 'POST' }));
+
+socket.on('spin:test', (t) => {
+  const w = t.spin.win;
+  $('spinTestResult').innerHTML = `Hasil test: <b>${w === 1000 ? '+1000 RBX SECRET' : '+' + w + ' RBX'}</b>` + (t.spin.secretPct ? ` · secret ${t.spin.secretPct}%` : '') + ` · persen: ${t.spin.weights.join('/')}`;
+});

@@ -195,3 +195,12 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
   - **Burst 100+:** sinar cahaya berputar, 3 gelombang kejut, garis percik, glitter, koin meledak lalu tersedot ke baris.
   - **Nuke 299+:** rudal asli, ledakan putih, awan jamur bergumpal, gelombang kejut di tanah, hujan koin.
   - Stars, Fountain, Hearts, Lightning, Fireworks diberi glitter berkelap-kelip. Suara Classic memakai set koin (bukan hex).
+
+## Spin RBX (fitur baru)
+
+- Di control page pilih **Prize mode**: `Text` (hadiah dari kolom Prize) atau `Spin RBX`.
+- Link overlay spin **terpisah & random** (kotak "Link overlay Spin" di Setup, tombol Copy). Format: `/spin/<token>`.
+- Pakai sebagai browser source sendiri, background hijau terang `#00ff00` → chroma key. Ganti warna: `?bg=00ff00`, atau `?bg=transparent`.
+- Tidak ada pemenang / mode Text → hanya background hijau. Ada pemenang (mode Spin) → foto + nama pemenang di atas, prize `???`, hitung mundur 5-1, persen RBX/secret, spin, hasil tampil (`Spin result tampil` detik), lalu semuanya hilang → hijau kosong.
+- Tombol **Test spin** untuk mencoba tanpa live.
+- Hasil spin ditentukan server saat pemenang final (draw ikut dihitung).
