@@ -204,3 +204,9 @@ Satu Railway service/instance cocok untuk model session in-memory + Socket.IO in
 - Tidak ada pemenang / mode Text → hanya background hijau. Ada pemenang (mode Spin) → foto + nama pemenang di atas, prize `???`, hitung mundur 5-1, persen RBX/secret, spin, hasil tampil (`Spin result tampil` detik), lalu semuanya hilang → hijau kosong.
 - Tombol **Test spin** untuk mencoba tanpa live.
 - Hasil spin ditentukan server saat pemenang final (draw ikut dihitung).
+
+### Spin Prizes (teks hadiah bisa diganti)
+- Di frame Setup, di sebelah tombol **Save**, ada tombol **🎁 Spin Prizes**.
+- Klik → muncul frame berisi textbox: **Basic, Rare, Epic, Legendary, Mythic, Secret**. Isi teks hadiah sesuai keinginan (maks 40 karakter), lalu klik **Save**.
+- Teks itu tampil di chip persen, tile reel, hasil pemenang, dan overlay winner. Kolom kosong = kembali ke default (`10 RBX`, `25 RBX`, dst).
+- Tersimpan per session, jadi tetap ada setelah restart.

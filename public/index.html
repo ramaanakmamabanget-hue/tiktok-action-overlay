@@ -44,7 +44,7 @@
           <div id="spinTestResult" class="muted" style="margin-top:8px">Klik Test spin untuk melihat hasil prize.</div></div>
         <label class="autosave-toggle"><input id="soundEnabled" type="checkbox" checked><span>Sound</span><small>Overlay sound effects (drop, tick, winner)</small></label>
         <label class="autosave-toggle"><input id="autoSave" type="checkbox"><span>Auto Save</span><small>Automatically save setup changes</small></label>
-        <div class="full actions-row"><button class="primary" id="saveBtn" type="submit">Save</button><button class="secondary" id="connectBtn" type="button">Connect</button><button class="danger" id="resetBtn" type="button">Reset Round</button><button class="secondary" id="reloadSnipeBtn" type="button">RELOAD SNIPE</button></div>
+        <div class="full actions-row"><button class="primary" id="saveBtn" type="submit">Save</button><button class="secondary" id="prizesBtn" type="button">🎁 Spin Prizes</button><button class="secondary" id="connectBtn" type="button">Connect</button><button class="danger" id="resetBtn" type="button">Reset Round</button><button class="secondary" id="reloadSnipeBtn" type="button">RELOAD SNIPE</button></div>
       </form>
     </section>
 
@@ -93,6 +93,21 @@
       </div>
     </section>
   </main>
+</div>
+<div class="modal hidden" id="prizeModal" role="dialog" aria-modal="true" aria-labelledby="prizeModalTitle">
+  <div class="modal-card">
+    <div class="modal-head"><div><h2 id="prizeModalTitle">🎁 Spin Prizes</h2><p>Isi teks hadiah untuk tiap tier. Teks ini yang tampil di tile spin &amp; hasil pemenang.</p></div><button type="button" class="modal-x" id="prizeModalClose" aria-label="Close">✕</button></div>
+    <div class="prize-fields">
+      <label class="pf" style="--c:#66728f"><span><i></i>Basic</span><input id="pz_basic" maxlength="40" placeholder="10 RBX" autocomplete="off"></label>
+      <label class="pf" style="--c:#4b9bff"><span><i></i>Rare</span><input id="pz_rare" maxlength="40" placeholder="25 RBX" autocomplete="off"></label>
+      <label class="pf" style="--c:#a56bff"><span><i></i>Epic</span><input id="pz_epic" maxlength="40" placeholder="50 RBX" autocomplete="off"></label>
+      <label class="pf" style="--c:#ff4f9a"><span><i></i>Legendary</span><input id="pz_legendary" maxlength="40" placeholder="100 RBX" autocomplete="off"></label>
+      <label class="pf" style="--c:#ffc233"><span><i></i>Mythic</span><input id="pz_mythic" maxlength="40" placeholder="500 RBX" autocomplete="off"></label>
+      <label class="pf pf-secret" style="--c:#ff4fd8"><span><i></i>Secret</span><input id="pz_secret" maxlength="40" placeholder="1000 RBX" autocomplete="off"></label>
+    </div>
+    <small class="field-help">Maks 40 karakter per hadiah. Kosongkan kolom untuk kembali ke default.</small>
+    <div class="modal-actions"><button type="button" class="secondary" id="prizeReset">Reset default</button><span style="flex:1"></span><button type="button" class="secondary" id="prizeCancel">Cancel</button><button type="button" class="primary" id="prizeSave">Save</button></div>
+  </div>
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/control.js"></script>

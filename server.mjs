@@ -27,6 +27,7 @@ const defaultConfig = {
   overlayTheme: 'classic',
   prizeMode: 'text',
   spinHoldSeconds: 8,
+  spinPrizes: null,
   autoSave: false
 };
 
@@ -43,6 +44,17 @@ function normPrizeMode(v) {
 
 // ---- Spin RBX (ported from Open Robux Chest) --------------------------------
 const SPIN_VALUES = [10, 25, 50, 100, 500];
+// Editable prize text per tier (control page -> "Spin Prizes"). Order = SPIN_VALUES, then secret.
+const SPIN_TIER_KEYS = ['basic', 'rare', 'epic', 'legendary', 'mythic', 'secret'];
+const DEFAULT_SPIN_PRIZES = { basic: '10 RBX', rare: '25 RBX', epic: '50 RBX', legendary: '100 RBX', mythic: '500 RBX', secret: '1000 RBX' };
+function normSpinPrizes(input) {
+  const out = {};
+  for (const k of SPIN_TIER_KEYS) {
+    const v = String(input?.[k] ?? '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    out[k] = v || DEFAULT_SPIN_PRIZES[k];
+  }
+  return out;
+}
 const SPIN_SECRET_CHANCE = 0.15;
 function randSpinWeights() {
   const idx = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
@@ -60,7 +72,7 @@ function randSpinWeights() {
   o.forEach((j, i) => { w[j] += p[i + 1] - p[i]; });
   return w;
 }
-function makeSpinPlan() {
+function makeSpinPlan(prizes) {
   const sec = Math.random() < SPIN_SECRET_CHANCE;
   const weights = sec ? Array.from({ length: 5 }, () => 31 + Math.floor(Math.random() * 30)) : randSpinWeights();
   const secretPct = sec ? (Math.random() < 0.65 ? 31 + Math.floor(Math.random() * 20) : 10 + Math.floor(Math.random() * 21)) : 0;
@@ -73,7 +85,7 @@ function makeSpinPlan() {
     win = SPIN_VALUES[0];
     for (let i = 0; i < 5; i++) { r -= weights[i]; if (r < 0) { win = SPIN_VALUES[i]; break; } }
   }
-  return { values: SPIN_VALUES, weights, secretPct, win };
+  return { values: SPIN_VALUES, weights, secretPct, win, prizes: normSpinPrizes(prizes) };
 }
 
 // Gifts above this many coins add extra time in regular/snipe phase.
@@ -97,6 +109,7 @@ config.prize = String(config.prize ?? defaultConfig.prize);
 config.overlayTheme = normTheme(config.overlayTheme);
 config.prizeMode = normPrizeMode(config.prizeMode);
 config.spinHoldSeconds = clampInt(config.spinHoldSeconds ?? 8, 3, 120);
+config.spinPrizes = normSpinPrizes(config.spinPrizes);
 let spinSeq = 0;
 if (!config.eulerApiKey) config.eulerApiKey = '';
 let activeConnectConfig = null;
@@ -154,6 +167,7 @@ function sanitizeConfig(input) {
     overlayTheme: normTheme(input.overlayTheme ?? config.overlayTheme),
     prizeMode: normPrizeMode(input.prizeMode ?? config.prizeMode),
     spinHoldSeconds: clampInt(input.spinHoldSeconds ?? config.spinHoldSeconds, 3, 120),
+    spinPrizes: normSpinPrizes(input.spinPrizes ?? config.spinPrizes),
     autoSave: Boolean(input.autoSave)
   };
 }
@@ -291,7 +305,7 @@ function publicState() {
     winner: safeWinner(state.winner),
     winnerChat: state.winnerChat || '',
     prize: config.prizeMode === 'spin'
-      ? (state.spin?.revealed ? `+${state.spin.win} RBX${state.spin.win === 1000 ? ' SECRET' : ''}` : 'SPIN RBX')
+      ? (state.spin?.revealed ? spinPrizeLabel(state.spin) : 'SPIN RBX')
       : (config.prize || ''),
     config: publicConfig,
     connection: connectionState,
@@ -473,11 +487,16 @@ function spinDone(seq) {
   broadcast();
 }
 
+function spinPrizeLabel(spin) {
+  const i = spin.win === 1000 ? 5 : SPIN_VALUES.indexOf(spin.win);
+  return spin.prizes?.[SPIN_TIER_KEYS[i]] || DEFAULT_SPIN_PRIZES[SPIN_TIER_KEYS[i]] || '';
+}
+
 function planSpin() {
   state.spin = null;
   if (!state.winner || config.prizeMode !== 'spin') return;
   spinSeq += 1;
-  state.spin = { seq: spinSeq, auctionId: state.auctionId, ...makeSpinPlan() };
+  state.spin = { seq: spinSeq, auctionId: state.auctionId, ...makeSpinPlan(config.spinPrizes) };
 }
 
 function finalizeWinner() {
@@ -801,7 +820,7 @@ function testSpin() {
   spinSeq += 1;
   io.to(room).emit('spin:test', {
     winner: { nickname: 'Demo Winner', avatar: fakeAvatar },
-    spin: { seq: spinSeq, auctionId: -1, ...makeSpinPlan() },
+    spin: { seq: spinSeq, auctionId: -1, ...makeSpinPlan(config.spinPrizes) },
     soundEnabled: config.soundEnabled !== false,
     holdSeconds: config.spinHoldSeconds
   });
@@ -1063,12 +1082,22 @@ app.post('/api/config', async (req, res) => {
     overlayTheme: normTheme(input.overlayTheme ?? current.overlayTheme),
     prizeMode: normPrizeMode(input.prizeMode ?? current.prizeMode),
     spinHoldSeconds: clamp(input.spinHoldSeconds ?? current.spinHoldSeconds ?? 8, 3, 120),
+    spinPrizes: normSpinPrizes(input.spinPrizes ?? current.spinPrizes),
     autoSave: Boolean(input.autoSave)
   };
 
   // The factory exposes a mutable config through its getter, so update it
   // without touching the active TikTok connection.
   Object.assign(current, nextConfig);
+  await session.saveConfig();
+  session.broadcast();
+  res.json(session.publicState());
+});
+
+app.post('/api/spin/prizes', async (req, res) => {
+  const session = await routeControlSession(req);
+  if (!session) return res.status(401).json({ error: 'Session not found.' });
+  session.config.spinPrizes = normSpinPrizes(req.body?.spinPrizes ?? req.body);
   await session.saveConfig();
   session.broadcast();
   res.json(session.publicState());

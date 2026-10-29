@@ -37,6 +37,7 @@ function fillSettings(c) {
   $('prizeMode').value = c.prizeMode === 'spin' ? 'spin' : 'text';
   syncPrizeSeg();
   $('spinHoldSeconds').value = c.spinHoldSeconds || 8;
+  fillPrizeFields(c.spinPrizes);
   const snd = $('soundEnabled'); if (snd) snd.checked = c.soundEnabled !== false;
   autoSaveEnabled = Boolean(c.autoSave);
   const toggle = $('autoSave');
@@ -189,11 +190,45 @@ socket.on('chat:message', m=>{ if(latest){ latest.chatLog=[...(latest.chatLog||[
 fetch('/api/state').then(r=>r.json()).then(render);
 
 $('copySpinBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('spinUrl').value); } catch { $('spinUrl').select(); document.execCommand('copy'); } $('copySpinBtn').textContent = 'Copied ✓'; setTimeout(() => { $('copySpinBtn').textContent = 'Copy'; }, 1000); });
+// ---- Spin Prizes modal
+const PRIZE_KEYS = ['basic', 'rare', 'epic', 'legendary', 'mythic', 'secret'];
+const PRIZE_DEFAULTS = { basic: '10 RBX', rare: '25 RBX', epic: '50 RBX', legendary: '100 RBX', mythic: '500 RBX', secret: '1000 RBX' };
+let savedPrizes = { ...PRIZE_DEFAULTS };
+function fillPrizeFields(p) {
+  savedPrizes = { ...PRIZE_DEFAULTS, ...(p || {}) };
+  if (!$('prizeModal').classList.contains('hidden')) return; // don't overwrite while editing
+  PRIZE_KEYS.forEach((k) => { $('pz_' + k).value = savedPrizes[k]; });
+}
+function openPrizeModal() {
+  PRIZE_KEYS.forEach((k) => { $('pz_' + k).value = savedPrizes[k]; });
+  $('prizeModal').classList.remove('hidden');
+  $('pz_basic').focus();
+}
+function closePrizeModal() { $('prizeModal').classList.add('hidden'); }
+$('prizesBtn').addEventListener('click', openPrizeModal);
+['prizeModalClose', 'prizeCancel'].forEach((id) => $(id).addEventListener('click', closePrizeModal));
+$('prizeModal').addEventListener('mousedown', (e) => { if (e.target === $('prizeModal')) closePrizeModal(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') closePrizeModal(); if (e.key === 'Enter' && e.target?.id?.startsWith('pz_')) $('prizeSave').click(); });
+$('prizeReset').addEventListener('click', () => { PRIZE_KEYS.forEach((k) => { $('pz_' + k).value = PRIZE_DEFAULTS[k]; }); });
+$('prizeSave').addEventListener('click', async () => {
+  const btn = $('prizeSave'); btn.disabled = true;
+  const spinPrizes = {}; PRIZE_KEYS.forEach((k) => { spinPrizes[k] = $('pz_' + k).value; });
+  try {
+    const r = await fetch('/api/spin/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spinPrizes }) });
+    if (!r.ok) throw new Error('save failed');
+    closePrizeModal();
+    render(await r.json());
+    const pb = $('prizesBtn'); pb.textContent = 'Saved ✓'; setTimeout(() => { pb.textContent = '🎁 Spin Prizes'; }, 1200);
+  } catch { btn.textContent = 'Save failed'; setTimeout(() => { btn.textContent = 'Save'; }, 1500); }
+  finally { btn.disabled = false; }
+});
+
 $('testSpinBtn').addEventListener('click', () => fetch('/api/spin/test', { method: 'POST' }));
 
 socket.on('spin:test', (t) => {
   const w = t.spin.win;
-  $('spinTestResult').innerHTML = `Hasil test: <b>${w === 1000 ? '+1000 RBX SECRET' : '+' + w + ' RBX'}</b>` + (t.spin.secretPct ? ` · secret ${t.spin.secretPct}%` : '') + ` · persen: ${t.spin.weights.join('/')}`;
+  const label = t.spin.prizes?.[w === 1000 ? 'secret' : PRIZE_KEYS[[10, 25, 50, 100, 500].indexOf(w)]] || w;
+  $('spinTestResult').innerHTML = `Hasil test: <b>${esc(label)}${w === 1000 ? ' (SECRET)' : ''}</b>` + (t.spin.secretPct ? ` · secret ${t.spin.secretPct}%` : '') + ` · persen: ${t.spin.weights.join('/')}`;
 });
 
 function syncPrizeSeg() {
