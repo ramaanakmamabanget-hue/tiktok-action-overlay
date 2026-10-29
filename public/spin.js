@@ -8,6 +8,9 @@
 
   const stage = $('#stage'), who = $('#who'), cd = $('#cd'), panel = $('#panel'), vp = $('#vp'), strip = $('#strip');
   const chipsBox = $('#chips'), secEl = $('#secret'), secSp = $('#sp');
+  const wk = $('#wKick'), rays = $('#rays'), flash = $('#flash'), near = $('#near');
+  // chasing marquee bulbs above/below the reel
+  ['#bulbsT', '#bulbsB'].forEach((s) => { $(s).innerHTML = Array.from({ length: 36 }, (_, i) => `<i style="--i:${i}"></i>`).join(''); });
   const RM = () => matchMedia('(prefers-reduced-motion:reduce)').matches;
   const R = { 10: { c: '#66728f', n: 'Common' }, 25: { c: '#4b9bff', n: 'Rare' }, 50: { c: '#a56bff', n: 'Epic' }, 100: { c: '#ff4f9a', n: 'Legendary' }, 500: { c: '#ffc233', n: 'Mythic' }, 1000: { c: '#ff4fd8', n: 'Secret' } };
   const V = [10, 25, 50, 100, 500];
@@ -41,6 +44,29 @@
     }
   }
 
+  function confetti(n, c) {
+    if (RM()) return;
+    const cols = [c, '#fff', '#ffc233', '#ff4f9a', '#4b9bff', '#2bff5a'];
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('i'); e.className = 'conf';
+      const w = 8 + Math.random() * 7;
+      e.style.cssText = `left:${Math.random() * 1200}px;top:-24px;width:${w}px;height:${w * 1.7}px;background:${c === 'rb' ? `hsl(${Math.random() * 360} 100% 60%)` : cols[i % cols.length]}`;
+      stage.appendChild(e);
+      const dx = (Math.random() - .5) * 260;
+      e.animate([{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: `translate(${dx}px,${900 + Math.random() * 120}px) rotate(${(Math.random() - .5) * 1440}deg)`, opacity: 1 }], { duration: 2400 + Math.random() * 2200, delay: Math.random() * 900, easing: 'cubic-bezier(.3,.2,.6,1)', fill: 'backwards' }).onfinish = () => e.remove();
+    }
+  }
+  function countUp(el, to, suffix, id) {
+    const t0 = performance.now(), D = 1000;
+    const f = (now) => {
+      if (id !== runId) return;
+      const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = `+${Math.round(to * e)} RBX${suffix}`;
+      if (p < 1) requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f);
+  }
+
   function clearAll() {
     runId++; running = false;
     stage.classList.add('hidden');
@@ -48,6 +74,11 @@
     panel.classList.remove('glow', 'rbw'); panel.style.animation = ''; panel.style.opacity = ''; stage.style.opacity = ''; stage.style.transition = '';
     chipsBox.innerHTML = ''; strip.innerHTML = ''; secEl.style.opacity = 0; vp.classList.remove('off');
     window.SecretFX && SecretFX.clear({ panel });
+    wk.textContent = 'WINNER'; wk.style.color = ''; wk.classList.remove('rb');
+    rays.classList.remove('on'); near.classList.remove('on'); vp.classList.remove('tense');
+    panel.classList.remove('live', 'flashing'); panel.style.removeProperty('--bt');
+    stage.querySelectorAll('.conf').forEach((e) => e.remove());
+    flash.getAnimations().forEach((a) => a.cancel());
   }
 
   async function play(winner, spin, opts) {
@@ -123,9 +154,9 @@
       const half = () => vp.clientWidth / 2, x0 = half() - (4 * STEP + TW / 2);
       strip.style.transform = `translateX(${x0}px)`;
       panel.style.setProperty('--lc', '#ffc233');
-      vp.classList.remove('off'); await sleep(1000, id);
+      vp.classList.remove('off'); panel.classList.add('live'); panel.style.setProperty('--bt', '1.4s'); await sleep(1000, id);
       const off = (Math.random() * .8 - .4) * TW, b = half() - (WIN * STEP + TW / 2 + off), dur = 15000, t0 = performance.now();
-      let li = 4, nb = 0;
+      let li = 4, nb = 0, bs = 0;
       await new Promise((done, fail) => {
         const f = (now) => {
           if (id !== runId) return fail(new Error('abort'));
@@ -133,7 +164,9 @@
           strip.style.transform = `translateX(${x}px)`;
           if (t > .5 && now > nb) { nb = now + 950 - 520 * Math.min(1, (t - .5) / .5); tone(110, .2, 'sine', .3); setTimeout(() => tone(90, .22, 'sine', .25), 150); if (!RM()) { $('#line').animate([{ transform: 'scaleX(4)' }, { transform: 'scaleX(1)' }], { duration: 320 }); panel.animate([{ transform: 'scale(1.012)' }, { transform: 'scale(1)' }], { duration: 320 }); } }
           const i = Math.floor((half() - x) / STEP);
-          if (i != li) { li = i; const el = strip.children[i]; if (el && !RM()) el.animate([{ transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 180 }); tone(420 + Math.random() * 60, .04, 'square', .025); }
+          if (!RM()) for (let q = i - 3; q <= i + 3; q++) { const el = strip.children[q]; if (!el) continue; const k = Math.max(0, 1 - Math.abs(x + q * STEP + TW / 2 - half()) / (STEP * 1.5)); el.style.transition = 'none'; el.style.transform = `scale(${1 + .14 * k})`; }
+          if (t > .35 && bs < 1) { bs = 1; panel.style.setProperty('--bt', '.9s'); } if (t > .7 && bs < 2) { bs = 2; panel.style.setProperty('--bt', '.5s'); } if (t > .82 && bs < 3) { bs = 3; vp.classList.add('tense'); }
+          if (i != li) { if (items[i]) panel.style.setProperty('--lc', R[items[i]].c); li = i; const el = strip.children[i]; if (el && !RM()) el.animate([{ transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 180 }); tone(420 + Math.random() * 60, .04, 'square', .025); }
           t < 1 ? requestAnimationFrame(f) : done();
         };
         requestAnimationFrame(f);
@@ -141,10 +174,22 @@
       await sleep(400, id);
 
       // 5. result
-      const c = R[win].c, ts = strip.children;
+      vp.classList.remove('tense');
+      [...strip.children].forEach((el) => { el.style.transform = ''; el.style.transition = ''; });
+      const c = R[win].c, ts = strip.children, sec = win == 1000;
       [...ts].forEach((el, i) => el.classList.add(i == WIN ? 'win' : 'dim'));
       panel.style.setProperty('--lc', c); panel.classList.add('glow'); if (win == 1000) panel.classList.add('rbw');
-      wp.textContent = win == 1000 ? '+1000 RBX SECRET' : `+${win} RBX`; wp.classList.add('got'); wp.style.borderColor = c;
+      socket.emit('spin:done', { seq: spin.seq });
+      wp.classList.add('got'); wp.style.borderColor = c; countUp(wp, win, sec ? ' SECRET' : '', id);
+      wk.textContent = sec ? '✦ SECRET ✦' : `★ ${R[win].n.toUpperCase()} ★`; wk.style.color = c; wk.classList.toggle('rb', sec);
+      if (!RM()) wk.animate([{ transform: 'scale(2.6)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 550, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+      rays.style.setProperty('--rc', sec ? '#fff' : c); if (win >= 50) rays.classList.add('on');
+      panel.classList.add('flashing'); panel.style.setProperty('--bt', '.4s');
+      flash.style.background = `radial-gradient(circle at 50% 55%,${sec ? '#fff' : c},transparent 65%)`;
+      if (!RM()) flash.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 1000, easing: 'ease-out' });
+      if (win >= 100) confetti(sec ? 160 : win >= 500 ? 120 : 70, sec ? 'rb' : c);
+      const nbv = Math.max(items[WIN - 1] || 0, items[WIN + 1] || 0);
+      if (nbv > win && nbv >= 100) setTimeout(() => { if (id !== runId) return; near.textContent = nbv == 1000 ? 'SO CLOSE TO SECRET!' : `SO CLOSE TO ${nbv} RBX!`; near.classList.add('on'); tone(260, .5, 'sawtooth', .05); setTimeout(() => tone(190, .6, 'sawtooth', .05), 220); }, 1100);
       const k = win == 1000 ? 4 : V.indexOf(win);
       [520, 660, 780, 1040, 1320].slice(0, k + 2).forEach((f, i) => setTimeout(() => tone(f, .25, 'triangle', .07), i * 110));
       if (win == 1000) { window.SecretFX && SecretFX.play({ tile: ts[WIN], panel, vp }); burst('rb'); setTimeout(() => burst('rb'), 250); setTimeout(() => burst('rb'), 600); }

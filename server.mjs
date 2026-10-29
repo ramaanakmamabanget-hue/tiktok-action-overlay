@@ -290,7 +290,9 @@ function publicState() {
     timeBonus: { minCoins: TIME_BONUS_MIN_COINS, seconds: TIME_BONUS_SECONDS },
     winner: safeWinner(state.winner),
     winnerChat: state.winnerChat || '',
-    prize: config.prizeMode === 'spin' ? 'SPIN RBX' : (config.prize || ''),
+    prize: config.prizeMode === 'spin'
+      ? (state.spin?.revealed ? `+${state.spin.win} RBX${state.spin.win === 1000 ? ' SECRET' : ''}` : 'SPIN RBX')
+      : (config.prize || ''),
     config: publicConfig,
     connection: connectionState,
     eventLog: eventLog.slice(-40),
@@ -461,6 +463,14 @@ function handleGift(data) {
   if (previousAt && Date.now() - previousAt < 5000) return;
   processedFingerprints.set(fingerprint, Date.now());
   applyCoins(data, giftCoins * repeatCount, { streak: false, repeatEnd: true });
+}
+
+// Called by the spin overlay once the reel has landed, so the winner overlay can swap
+// "SPIN RBX" for the prize that was actually won.
+function spinDone(seq) {
+  if (!state.spin || state.spin.revealed || Number(seq) !== state.spin.seq) return;
+  state.spin.revealed = true;
+  broadcast();
 }
 
 function planSpin() {
@@ -826,6 +836,7 @@ return {
   room,
   publicState,
   testSpin,
+  spinDone,
   broadcast,
   connectTikTok,
   startAuction,
@@ -1182,6 +1193,7 @@ io.on('connection', (socket) => {
   const session = socket.data.auctionSession;
   socket.join(session.room);
   socket.emit('auction:state', session.publicState());
+  socket.on('spin:done', (d) => session.spinDone(d?.seq));
 });
 
 setInterval(() => {

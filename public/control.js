@@ -35,6 +35,7 @@ function fillSettings(c) {
   $('drawMarginCoins').value = c.drawMarginCoins;
   $('prize').value = c.prize || c.prizes?.['1'] || '';
   $('prizeMode').value = c.prizeMode === 'spin' ? 'spin' : 'text';
+  syncPrizeSeg();
   $('spinHoldSeconds').value = c.spinHoldSeconds || 8;
   const snd = $('soundEnabled'); if (snd) snd.checked = c.soundEnabled !== false;
   autoSaveEnabled = Boolean(c.autoSave);
@@ -73,7 +74,7 @@ function render(s) {
       overlayFrame.dataset.sessionOverlay = overlayUrl;
     }
   }
-  if (s.spinToken) { const u = `${location.origin}/spin/${s.spinToken}`; if ($('spinUrl').value !== u) { $('spinUrl').value = u; $('spinFrame').src = u; } }
+  if (s.spinToken) { const u = `${location.origin}/spin/${s.spinToken}`; if ($('spinUrl').value !== u) { $('spinUrl').value = u; $('spinFrame').src = u; } const os = $('openSpin'); if (os) { os.href = u; os.removeAttribute('aria-disabled'); } }
   if (s.config) fillSettings(s.config);
   markTheme(s.config?.overlayTheme);
   const status = s.connection?.status || 'disconnected';
@@ -194,3 +195,13 @@ socket.on('spin:test', (t) => {
   const w = t.spin.win;
   $('spinTestResult').innerHTML = `Hasil test: <b>${w === 1000 ? '+1000 RBX SECRET' : '+' + w + ' RBX'}</b>` + (t.spin.secretPct ? ` · secret ${t.spin.secretPct}%` : '') + ` · persen: ${t.spin.weights.join('/')}`;
 });
+
+function syncPrizeSeg() {
+  const v = $('prizeMode').value;
+  document.querySelectorAll('#prizeModeSeg .seg-opt').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.mode === v)));
+}
+document.querySelectorAll('#prizeModeSeg .seg-opt').forEach((b) => b.addEventListener('click', () => {
+  $('prizeMode').value = b.dataset.mode;
+  syncPrizeSeg();
+  $('prizeMode').dispatchEvent(new Event('change', { bubbles: true }));
+}));

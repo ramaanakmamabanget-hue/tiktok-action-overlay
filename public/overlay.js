@@ -625,7 +625,7 @@ function render(s){
     $('winnerName').textContent=s.winner.nickname || 'Unknown';
     $('winnerCoins').textContent=s.winner.coins.toLocaleString();
     $('winnerAvatar').src=avatar(s.winner.avatar);
-    { const wp=String(s.prize||'').trim()||'Prize #1'; const we=$('winnerPrize'); we.textContent=wp; we.dataset.text=wp; }
+    { const wp=String(s.prize||'').trim()||'Prize #1'; const we=$('winnerPrize'); const changed=we.dataset.text && we.dataset.text!==wp; we.textContent=wp; we.dataset.text=wp; if(changed && we.animate) we.animate([{transform:'scale(1.5)',filter:'brightness(2)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:600,easing:'cubic-bezier(.3,1.5,.5,1)'}); }
     syncWinnerChat(s.winner, s.chatLog || [], s.winnerChat || '', s.winnerChatMeta || {});
   } else {
     winnerPanel.classList.add('hidden');

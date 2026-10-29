@@ -14,6 +14,7 @@
       <div class="muted">TikTok LIVE overlay control</div>
     </div>
     <div class="top-actions">
+      <a class="ghost ghost-spin" id="openSpin" href="#" target="_blank" aria-disabled="true">🎰 Open Spin</a>
       <a class="ghost" id="openOverlay" href="/overlay" target="_blank">Open Overlay</a>
       <span id="connBadge" class="status-badge">DISCONNECTED</span>
     </div>
@@ -31,12 +32,16 @@
         <label>Minimum C<input id="minimumCoins" type="number" min="0"></label>
         <label>Draw margin (C)<input id="drawMarginCoins" type="number" min="0"></label>
         <label class="full">Prize<input id="prize" placeholder="e.g. 500 Robux"></label>
-        <label>Prize mode<select id="prizeMode"><option value="text">Text (hadiah dari kolom Prize)</option><option value="spin">Spin RBX (overlay spin terpisah)</option></select></label>
+        <div class="prize-mode-field"><span class="field-label">Prize mode</span>
+          <select id="prizeMode" class="sr-only" tabindex="-1" aria-hidden="true"><option value="text">Text</option><option value="spin">Spin RBX</option></select>
+          <div class="seg" id="prizeModeSeg" role="radiogroup" aria-label="Prize mode">
+            <button type="button" class="seg-opt" role="radio" data-mode="text" aria-checked="true"><span class="seg-ico">✍️</span><span class="seg-txt"><b>Text</b><small>Hadiah dari kolom Prize</small></span></button>
+            <button type="button" class="seg-opt" role="radio" data-mode="spin" aria-checked="false"><span class="seg-ico">🎰</span><span class="seg-txt"><b>Spin RBX</b><small>Overlay spin terpisah</small></span></button>
+          </div></div>
         <label>Spin result tampil (detik)<input id="spinHoldSeconds" type="number" min="3" max="120" value="8"></label>
         <div class="full spin-link-box"><small class="field-help">Link overlay Spin (browser source terpisah, background hijau chroma):</small>
           <div style="display:flex;gap:8px;margin-top:6px"><input id="spinUrl" readonly style="flex:1"><button type="button" class="secondary" id="copySpinBtn">Copy</button><button type="button" class="secondary" id="testSpinBtn">Test spin</button></div>
-          <div id="spinTestResult" class="muted" style="margin-top:8px">Klik Test spin untuk melihat hasil prize.</div>
-          <div class="preview-wrap"><div class="preview-title">Spin preview</div><iframe id="spinFrame" title="Spin overlay preview" style="background:#00ff00"></iframe></div></div>
+          <div id="spinTestResult" class="muted" style="margin-top:8px">Klik Test spin untuk melihat hasil prize.</div></div>
         <label class="autosave-toggle"><input id="soundEnabled" type="checkbox" checked><span>Sound</span><small>Overlay sound effects (drop, tick, winner)</small></label>
         <label class="autosave-toggle"><input id="autoSave" type="checkbox"><span>Auto Save</span><small>Automatically save setup changes</small></label>
         <div class="full actions-row"><button class="primary" id="saveBtn" type="submit">Save</button><button class="secondary" id="connectBtn" type="button">Connect</button><button class="danger" id="resetBtn" type="button">Reset Round</button><button class="secondary" id="reloadSnipeBtn" type="button">RELOAD SNIPE</button></div>
@@ -51,6 +56,7 @@
         <div class="metric"><span>Auction</span><strong id="auctionId">#0</strong></div>
       </div>
       <div class="preview-wrap"><div class="preview-title">Overlay preview</div><iframe id="overlayFrame" src="/overlay" title="Auction overlay preview"></iframe></div>
+      <div class="preview-wrap spin-preview"><div class="preview-title">Spin preview</div><iframe id="spinFrame" title="Spin overlay preview" style="background:#00ff00"></iframe></div>
     </section>
 
     <section class="panel leaderboard-panel">
